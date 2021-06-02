@@ -60,9 +60,6 @@ async fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    let mut final_height = 0u32;
-    let mut final_width = 0u32;
-    let mut images = Vec::with_capacity(config.imgs.len());
     let (tx, rx) = channel::unbounded();
 
     println!("Loading images...");
@@ -97,6 +94,9 @@ async fn main() -> Result<()> {
         });
     }
 
+    let mut final_height = 0u32;
+    let mut final_width = 0u32;
+    let mut images = Vec::with_capacity(config.imgs.len());
     for _ in 0..config.imgs.len() {
         let msg = rx.recv().await.unwrap();
         match msg {
@@ -110,7 +110,6 @@ async fn main() -> Result<()> {
             }
         }
     }
-
     images.sort_by(|a, b| a.order.cmp(&b.order));
 
     let mut final_img: RgbaImage = ImageBuffer::new(final_width, final_height);
