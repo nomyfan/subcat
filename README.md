@@ -5,4 +5,4 @@ A utility to concatenate subtitles.
 ## TODO
 
 - [ ] GUI
-- [ ] Load images concurrently
+- [x] Load images concurrently
