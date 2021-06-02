@@ -1,0 +1,19 @@
+{
+  "name": "subcat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "nomyfan <Nomyfan@live.com>",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "husky install",
+    "fmt": "yarn fmt:rs",
+    "fmt:rs": "cargo fmt",
+    "lint": "yarn lint:rs",
+    "lint:rs": "cargo clippy -- -D warnings"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "husky": "^6.0.0"
+  }
+}
