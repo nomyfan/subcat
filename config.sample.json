@@ -1,33 +1,33 @@
 {
   "imgs": [
     {
-      "path": "C:\\Users\\username\\Desktop\\Konan\\20210530_1.png",
+      "path": "C:\\Users\\username\\Desktop\\Conan\\20210530_1.png",
       "offsetX": 0,
       "offsetY": 0,
       "width": 3840,
       "height": 2056
     },
     {
-      "path": "C:\\Users\\username\\Desktop\\Konan\\20210530_2.png",
+      "path": "C:\\Users\\username\\Desktop\\Conan\\20210530_2.png",
       "offsetX": 0,
       "offsetY": 1876,
       "width": 3840,
       "height": 186
     },
     {
-      "path": "C:\\Users\\username\\Desktop\\Konan\\20210530_3.png",
+      "path": "C:\\Users\\username\\Desktop\\Conan\\20210530_3.png",
       "offsetX": 0,
       "offsetY": 1876,
       "width": 3840,
       "height": 186
     },
     {
-      "path": "C:\\Users\\username\\Desktop\\Konan\\20210530_4.png",
+      "path": "C:\\Users\\username\\Desktop\\Conan\\20210530_4.png",
       "offsetX": 0,
       "offsetY": 1876,
       "width": 3840,
       "height": 186
     }
   ],
-  "saveTo": "C:\\Users\\username\\Desktop\\Konan\\20210530_final.png"
+  "saveTo": "C:\\Users\\username\\Desktop\\Conan\\20210530_final.png"
 }
