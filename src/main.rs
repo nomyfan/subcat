@@ -64,8 +64,8 @@ async fn main() -> Result<()> {
     let mut final_width = 0u32;
     let mut images = Vec::with_capacity(config.imgs.len());
     let (tx, rx) = channel::unbounded();
-    println!("Loading images...");
 
+    println!("Loading images...");
     for (i, img_config) in config.imgs.iter().enumerate() {
         let order = i;
         let path = img_config.path.to_string();
@@ -112,14 +112,13 @@ async fn main() -> Result<()> {
     }
 
     images.sort_by(|a, b| a.order.cmp(&b.order));
-    let images: Vec<ImageBuffer<image::Rgba<u8>, Vec<u8>>> =
-        images.into_iter().map(|x| x.img).collect();
 
     let mut final_img: RgbaImage = ImageBuffer::new(final_width, final_height);
     let mut y_offset = 0u32;
 
     println!("Generating...");
-    for img in &images {
+    for msg in &images {
+        let img = &msg.img;
         final_img.copy_from(img, 0, y_offset)?;
         y_offset += img.dimensions().1;
     }
