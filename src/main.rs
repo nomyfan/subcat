@@ -1,8 +1,8 @@
 use anyhow::Result;
+use async_std::{channel, fs, task};
 use clap::{App, Arg};
 use image::{GenericImage, ImageBuffer, RgbaImage};
 use serde::{Deserialize, Serialize};
-use std::io::Read;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Image {
@@ -22,11 +22,8 @@ struct Config {
     save_to: String,
 }
 
-fn load_config(config_path: &str) -> Result<Config> {
-    let mut config_file = std::fs::File::open(config_path)?;
-    let mut raw_config = String::new();
-    config_file.read_to_string(&mut raw_config)?;
-
+async fn load_config(config_path: &str) -> Result<Config> {
+    let raw_config = fs::read_to_string(config_path).await?;
     let config: Config = serde_json::from_str(&raw_config)?;
 
     Ok(config)
@@ -47,34 +44,76 @@ fn cli<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
-fn main() -> Result<()> {
+struct ImageMessage {
+    order: usize,
+    img: ImageBuffer<image::Rgba<u8>, Vec<u8>>,
+}
+
+#[async_std::main]
+async fn main() -> Result<()> {
     let app = cli();
     let matches = app.get_matches();
 
-    let config = load_config(matches.value_of("config").unwrap())?;
+    let config = load_config(matches.value_of("config").unwrap()).await?;
     if config.imgs.is_empty() {
-        eprintln!("No images specified, please check the config file.");
+        eprintln!("No image specified, please check the config file.");
         std::process::exit(1);
     }
 
     let mut final_height = 0u32;
     let mut final_width = 0u32;
-    let mut images = vec![];
+    let mut images = Vec::with_capacity(config.imgs.len());
+    let (tx, rx) = channel::unbounded();
     println!("Loading images...");
-    for img_config in &config.imgs {
-        let mut img = image::open(img_config.path.to_string()).unwrap();
 
-        let sub_image = img.sub_image(
-            img_config.offset_x,
-            img_config.offset_y,
-            img_config.width,
-            img_config.height,
-        );
-        images.push(sub_image.to_image());
+    for (i, img_config) in config.imgs.iter().enumerate() {
+        let order = i;
+        let path = img_config.path.to_string();
+        let x = img_config.offset_x;
+        let y = img_config.offset_y;
+        let width = img_config.width;
+        let height = img_config.height;
+        let tx = tx.clone();
 
-        final_height += img_config.height;
-        final_width = final_width.max(img_config.width);
+        task::spawn(async move {
+            match fs::read(path).await {
+                Ok(file) => match image::load_from_memory(&file) {
+                    Ok(mut img) => {
+                        let sub_image = img.sub_image(x, y, width, height);
+                        let msg = ImageMessage {
+                            order,
+                            img: sub_image.to_image(),
+                        };
+                        let _ = tx.send(Ok(msg)).await;
+                    }
+                    Err(e) => {
+                        let _ = tx.send(Err(anyhow::anyhow!(e))).await;
+                    }
+                },
+                Err(e) => {
+                    let _ = tx.send(Err(anyhow::anyhow!(e))).await;
+                }
+            }
+        });
     }
+
+    for _ in 0..config.imgs.len() {
+        let msg = rx.recv().await.unwrap();
+        match msg {
+            Ok(msg) => {
+                final_height += msg.img.height();
+                final_width = final_width.max(msg.img.width());
+                images.push(msg);
+            }
+            Err(e) => {
+                panic!("{}", e);
+            }
+        }
+    }
+
+    images.sort_by(|a, b| a.order.cmp(&b.order));
+    let images: Vec<ImageBuffer<image::Rgba<u8>, Vec<u8>>> =
+        images.into_iter().map(|x| x.img).collect();
 
     let mut final_img: RgbaImage = ImageBuffer::new(final_width, final_height);
     let mut y_offset = 0u32;
