@@ -11,6 +11,9 @@ function PreviewItem(props: { item: Item }) {
 
   const displayClientHeight = clientHeight * (item.middle / 100);
 
+  const backgroundPositionY =
+    -((100 - (item.middle + item.bottom)) / 100) * clientHeight;
+
   return (
     <div
       ref={ref}
@@ -20,9 +23,7 @@ function PreviewItem(props: { item: Item }) {
         backgroundImage: `url(${item.src})`,
         backgroundSize: `100% auto`,
         backgroundRepeat: "no-repeat",
-        backgroundPositionY: `${
-          -((100 - (item.middle + item.bottom)) / 100) * clientHeight
-        }px`,
+        backgroundPositionY: `${backgroundPositionY}px`,
       }}
     />
   );
