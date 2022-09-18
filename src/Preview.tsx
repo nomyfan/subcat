@@ -1,31 +1,30 @@
 import { useAppContext } from "./store";
 import type { Item } from "./types";
-import { useState } from "react";
+import { useMeasure } from "react-use";
 
 function PreviewItem(props: { item: Item }) {
   const { item } = props;
 
-  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const [ref, { width }] = useMeasure<HTMLDivElement>();
 
-  const backgroundHeight = element
-    ? (element.clientWidth * item.height) / item.width
-    : 0;
+  const clientHeight = (width * item.height) / item.width;
 
-  const clientHeight = backgroundHeight * (item.middle / 100);
+  const displayClientHeight = clientHeight * (item.middle / 100);
 
   return (
     <div
-      ref={setElement}
+      ref={ref}
       style={{
         width: "100%",
-        height: clientHeight,
+        height: displayClientHeight,
         backgroundImage: `url(${item.src})`,
         backgroundSize: `100% auto`,
         backgroundRepeat: "no-repeat",
         backgroundPositionY: `${
-          -((100 - (item.middle + item.bottom)) / 100) * backgroundHeight
+          -((100 - (item.middle + item.bottom)) / 100) * clientHeight
         }px`,
-      }}></div>
+      }}
+    />
   );
 }
 
