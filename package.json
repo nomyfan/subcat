@@ -1,19 +1,41 @@
 {
   "name": "subcat",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "nomyfan <Nomyfan@live.com>",
-  "license": "MIT",
+  "private": true,
+  "version": "0.0.0",
   "scripts": {
-    "prepare": "husky install",
-    "fmt": "yarn fmt:rs",
-    "fmt:rs": "cargo fmt",
-    "lint": "yarn lint:rs",
-    "lint:rs": "cargo clippy -- -D warnings"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "precommit": "pnpm fmt",
+    "tauri": "tauri",
+    "fmt": "pnpm fmt:rs",
+    "fmt:rs": "cd src-tauri && cargo fmt",
+    "lint": "pnpm lint:rs",
+    "lint:rs": "cd src-tauri && cargo clippy -- -D warnings"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.0.2",
+    "react": "^17",
+    "react-dom": "^17",
+    "rxjs": "^7.5.5",
+    "rxtore": "^0.0.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "husky": "^6.0.0"
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
+    "@tauri-apps/cli": "^1.0.3",
+    "@types/react": "^17",
+    "@types/react-dom": "^17",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "@vitejs/plugin-react": "^1.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^8.0.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.9"
   }
 }

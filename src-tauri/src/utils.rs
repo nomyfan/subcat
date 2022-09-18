@@ -1,6 +1,5 @@
 use anyhow::Result;
 use async_std::{channel, fs, task};
-use clap::{App, Arg};
 use image::{GenericImage, ImageBuffer, RgbaImage};
 use serde::{Deserialize, Serialize};
 
@@ -49,8 +48,7 @@ struct ImageMessage {
     img: ImageBuffer<image::Rgba<u8>, Vec<u8>>,
 }
 
-#[async_std::main]
-async fn main() -> Result<()> {
+async fn run() -> Result<()> {
     let app = cli();
     let matches = app.get_matches();
 
