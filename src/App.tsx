@@ -70,15 +70,22 @@ function App() {
 
   return (
     <AppContext.Provider value={store}>
-      <button onClick={handleSelectImages}>Select images</button>
-      <input
-        value={saveTo}
-        onChange={(evt) => {
-          setSaveTo(evt.target.value);
-        }}
+      <Layout
+        head={
+          <>
+            <button onClick={handleSelectImages}>Select images</button>
+            <input
+              value={saveTo}
+              onChange={(evt) => {
+                setSaveTo(evt.target.value);
+              }}
+            />
+            <button onClick={handleGenerate}>Ok</button>
+          </>
+        }
+        content={<Content />}
+        preview={<Preview />}
       />
-      <button onClick={handleGenerate}>Ok</button>
-      <Layout content={<Content />} preview={<Preview />} />
     </AppContext.Provider>
   );
 }

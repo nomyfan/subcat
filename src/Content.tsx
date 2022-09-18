@@ -6,7 +6,7 @@ function Content() {
   const { store: items, setStore } = useStore((st) => st.items);
 
   return (
-    <div>
+    <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
       {items.map((it, i) => {
         return (
           <Selector
