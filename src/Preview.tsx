@@ -7,7 +7,7 @@ function PreviewItem(props: { item: Item }) {
 
   const [ref, { width }] = useMeasure<HTMLDivElement>();
 
-  const clientHeight = (width * item.height) / item.width;
+  const clientHeight = !item.width ? 0 : (width * item.height) / item.width;
 
   const displayClientHeight = clientHeight * (item.middle / 100);
 
