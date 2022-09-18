@@ -6,7 +6,7 @@ function Content() {
   const { store: items, setStore } = useStore((st) => st.items);
 
   return (
-    <div className="comp_content">
+    <div>
       {items.map((it, i) => {
         return (
           <Selector

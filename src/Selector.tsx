@@ -30,7 +30,7 @@ function Selector(
   return (
     <div
       ref={rootElementRef}
-      className="selector"
+      className="relative not-last:mb-5"
       onMouseUp={() => {
         ref.current = undefined;
       }}
@@ -71,16 +71,7 @@ function Selector(
         }
       }}>
       {props.children}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}>
+      <div className="absolute top-0 left-0 h-full w-full flex flex-col">
         <div
           style={{
             backgroundColor: "hsla(0, 100%, 0%, 0.6)",
