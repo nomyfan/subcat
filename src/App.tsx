@@ -28,18 +28,18 @@ function App() {
               store.next((st) => {
                 return {
                   ...st,
-                  items: fileUrls
-                    .map((src) => convertFileSrc(src))
-                    .map((src, i) => {
-                      return {
-                        id: `${src}_${i}`,
-                        src,
-                        height: 0,
-                        width: 0,
-                        middle: 10,
-                        bottom: 0,
-                      };
-                    }),
+                  items: fileUrls.map((url, i) => {
+                    const src = convertFileSrc(url);
+                    return {
+                      id: `${src}_${i}`,
+                      url,
+                      src,
+                      height: 0,
+                      width: 0,
+                      middle: 10,
+                      bottom: 0,
+                    };
+                  }),
                 };
               });
             }
