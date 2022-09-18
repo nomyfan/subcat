@@ -1,46 +1,24 @@
 use anyhow::Result;
-use async_std::{channel, fs, task};
 use image::{GenericImage, ImageBuffer, RgbaImage};
 use serde::{Deserialize, Serialize};
+use tokio::{fs, sync::mpsc::unbounded_channel, task};
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Image {
-    path: String,
+pub(crate) struct Image {
+    pub(crate) path: String,
     #[serde(alias = "offsetY")]
-    offset_y: u32,
+    pub(crate) offset_y: u32,
     #[serde(alias = "offsetX")]
-    offset_x: u32,
-    width: u32,
-    height: u32,
+    pub(crate) offset_x: Option<u32>,
+    pub(crate) width: u32,
+    pub(crate) height: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Config {
-    imgs: Vec<Image>,
+pub(crate) struct Config {
+    pub(crate) imgs: Vec<Image>,
     #[serde(alias = "saveTo")]
-    save_to: String,
-}
-
-async fn load_config(config_path: &str) -> Result<Config> {
-    let raw_config = fs::read_to_string(config_path).await?;
-    let config: Config = serde_json::from_str(&raw_config)?;
-
-    Ok(config)
-}
-
-fn cli<'a, 'b>() -> App<'a, 'b> {
-    App::new("subcat")
-        .author("Kim Chan(@nomyfan)")
-        .version("0.1.0")
-        .about("A utility to concatenate subtitles")
-        .arg(
-            Arg::with_name("config")
-                .short("c")
-                .long("config")
-                .value_name("FILE")
-                .help("Config file")
-                .default_value("./config.json"),
-        )
+    pub(crate) save_to: String,
 }
 
 struct ImageMessage {
@@ -48,23 +26,16 @@ struct ImageMessage {
     img: ImageBuffer<image::Rgba<u8>, Vec<u8>>,
 }
 
-async fn run() -> Result<()> {
-    let app = cli();
-    let matches = app.get_matches();
+pub(crate) async fn generate(config: Config) -> Result<()> {
+    let Config { imgs, save_to } = config;
+    let imgs_count = imgs.len();
 
-    let config = load_config(matches.value_of("config").unwrap()).await?;
-    if config.imgs.is_empty() {
-        eprintln!("No image specified, please check the config file.");
-        std::process::exit(1);
-    }
-
-    let (tx, rx) = channel::unbounded();
+    let (tx, mut rx) = unbounded_channel();
 
     println!("Loading images...");
-    for (i, img_config) in config.imgs.iter().enumerate() {
+    for (i, img_config) in imgs.iter().enumerate() {
         let order = i;
         let path = img_config.path.to_string();
-        let x = img_config.offset_x;
         let y = img_config.offset_y;
         let width = img_config.width;
         let height = img_config.height;
@@ -74,19 +45,19 @@ async fn run() -> Result<()> {
             match fs::read(path).await {
                 Ok(file) => match image::load_from_memory(&file) {
                     Ok(mut img) => {
-                        let sub_image = img.sub_image(x, y, width, height);
+                        let sub_image = img.sub_image(0, y, width, height);
                         let msg = ImageMessage {
                             order,
                             img: sub_image.to_image(),
                         };
-                        let _ = tx.send(Ok(msg)).await;
+                        let _ = tx.send(Ok(msg));
                     }
                     Err(e) => {
-                        let _ = tx.send(Err(anyhow::anyhow!(e))).await;
+                        let _ = tx.send(Err(anyhow::anyhow!(e)));
                     }
                 },
                 Err(e) => {
-                    let _ = tx.send(Err(anyhow::anyhow!(e))).await;
+                    let _ = tx.send(Err(anyhow::anyhow!(e)));
                 }
             }
         });
@@ -94,8 +65,8 @@ async fn run() -> Result<()> {
 
     let mut final_height = 0u32;
     let mut final_width = 0u32;
-    let mut images = Vec::with_capacity(config.imgs.len());
-    for _ in 0..config.imgs.len() {
+    let mut images = Vec::with_capacity(imgs_count);
+    for _ in 0..imgs_count {
         let msg = rx.recv().await.unwrap();
         match msg {
             Ok(msg) => {
@@ -103,9 +74,7 @@ async fn run() -> Result<()> {
                 final_width = final_width.max(msg.img.width());
                 images.push(msg);
             }
-            Err(e) => {
-                panic!("{}", e);
-            }
+            Err(e) => panic!("{:?}", e),
         }
     }
     images.sort_by(|a, b| a.order.cmp(&b.order));
@@ -121,7 +90,7 @@ async fn run() -> Result<()> {
     }
 
     println!("Saving...");
-    final_img.save(config.save_to)?;
+    final_img.save(save_to)?;
 
     Ok(())
 }

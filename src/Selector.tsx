@@ -9,7 +9,7 @@ interface Heights {
 }
 
 function valueInRange(value: number, min = 0, max = 100) {
-  return Math.max(0, Math.min(100, value));
+  return Math.max(min, Math.min(max, value));
 }
 
 function Selector(
