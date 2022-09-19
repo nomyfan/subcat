@@ -30,7 +30,7 @@ function Selector(
   return (
     <div
       ref={rootElementRef}
-      className="relative not-last:mb-5"
+      className="relative"
       onMouseUp={() => {
         ref.current = undefined;
       }}
