@@ -38,7 +38,7 @@ function App() {
               src,
               height: 0,
               width: 0,
-              middle: 10,
+              middle: i === 0 ? 100 : 10,
               bottom: 0,
             };
           }),
