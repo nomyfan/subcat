@@ -33,6 +33,7 @@ function Preview() {
   const { useStore } = useAppContext();
 
   const { store: items } = useStore((st) => st.items);
+  console.log("__DEBUG__ preview items", items);
 
   return (
     <div>

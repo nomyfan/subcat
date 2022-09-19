@@ -1,3 +1,5 @@
+use std::path;
+
 use anyhow::Result;
 use image::{GenericImage, ImageBuffer, RgbaImage};
 use serde::{Deserialize, Serialize};
@@ -17,8 +19,8 @@ pub(crate) struct Image {
 #[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Config {
     pub(crate) imgs: Vec<Image>,
-    #[serde(alias = "saveTo")]
-    pub(crate) save_to: String,
+    pub(crate) dir: String,
+    pub(crate) filename: String,
 }
 
 struct ImageMessage {
@@ -27,7 +29,11 @@ struct ImageMessage {
 }
 
 pub(crate) async fn generate(config: Config) -> Result<()> {
-    let Config { imgs, save_to } = config;
+    let Config {
+        imgs,
+        dir,
+        filename,
+    } = config;
     let imgs_count = imgs.len();
 
     let (tx, mut rx) = unbounded_channel();
@@ -90,6 +96,7 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     }
 
     println!("Saving...");
+    let save_to = path::Path::new(&dir[..]).join(filename + ".png");
     final_img.save(save_to)?;
 
     Ok(())
