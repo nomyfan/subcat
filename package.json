@@ -14,10 +14,11 @@
     "lint:rs": "cd src-tauri && cargo clippy -- -D warnings"
   },
   "dependencies": {
+    "@fluentui/react": "^8.96.0",
     "@tauri-apps/api": "^1.1.0",
-    "antd": "^4.23.2",
     "react": "^17",
     "react-dom": "^17",
+    "react-hook-form": "^7.35.0",
     "react-use": "^17.4.0",
     "rxjs": "^7.5.5",
     "rxtore": "^0.0.5"

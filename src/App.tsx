@@ -4,10 +4,20 @@ import { Preview } from "./Preview";
 import { AppContext, useStoreCreation } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
-import { emit, listen } from "@tauri-apps/api/event";
-import { Dropdown, Menu, Modal, Form, Input, Button } from "antd";
-import { useRef, useState } from "react";
-import { useMount } from "react-use";
+import { emit } from "@tauri-apps/api/event";
+import { useRef } from "react";
+import { useBoolean } from "react-use";
+import {
+  CommandButton,
+  DefaultButton,
+  Dialog,
+  DialogFooter,
+  DialogType,
+  type IContextualMenuProps,
+  PrimaryButton,
+  TextField,
+} from "@fluentui/react";
+import { useForm, Controller } from "react-hook-form";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -20,36 +30,10 @@ function App() {
 
   const emptySelection = useStore((st) => !st.items.length).store;
 
-  const [visible, setVisible] = useState(false);
-  const hide = () => setVisible(false);
-  const show = () => setVisible(true);
+  const [visible, toggleVisible] = useBoolean(false);
 
-  const [form] = Form.useForm<{ filename: string; saveto: string }>();
-
-  useMount(() => {
-    let disposed = false;
-    let disposeFn: (() => void) | undefined = undefined;
-    const dispose = () => {
-      if (disposed) {
-        return;
-      }
-
-      disposed = true;
-      disposeFn?.();
-    };
-    (async () => {
-      disposeFn = await listen("be-generate-ok", () => {
-        if (!disposed) {
-          setVisible(false);
-        }
-      });
-      if (disposed) {
-        disposeFn();
-      }
-    })();
-
-    return () => dispose();
-  });
+  const form = useForm<{ filename: string; saveto: string }>();
+  const formValues = form.watch();
 
   const handleSelectImages = async () => {
     const files = await open({
@@ -83,7 +67,7 @@ function App() {
   };
 
   const handleGenerate = async () => {
-    const { saveto, filename } = await form.validateFields();
+    const { saveto, filename } = formValues;
     const items = getValue().items;
     if (items.length) {
       await emit("fe-subcat-generate", {
@@ -114,76 +98,79 @@ function App() {
     });
 
     if (typeof dir === "string") {
-      form.setFieldsValue({ saveto: dir });
+      form.setValue("saveto", dir);
     }
   };
 
-  const menus = (
-    <Menu
-      items={[
-        {
-          key: "select_images",
-          label: "Select images",
-          onClick: () => handleSelectImages(),
+  const menuProps: IContextualMenuProps = {
+    items: [
+      {
+        key: "select_images",
+        text: "Select images",
+        onClick: () => {
+          handleSelectImages();
         },
-        {
-          key: "save_as",
-          label: "Save as",
-          onClick: () => {
-            form.resetFields();
-            show();
-          },
-          disabled: emptySelection,
+      },
+      {
+        key: "save_as",
+        text: "Save as",
+        onClick: () => {
+          form.reset();
+          toggleVisible(true);
         },
-      ]}
-    />
-  );
+        disabled: emptySelection,
+      },
+    ],
+  };
 
   return (
     <AppContext.Provider value={store}>
       <Layout
         head={
           <div className="bg-gray-100">
-            <Dropdown overlay={menus} trigger={["click"]}>
-              <Button type="text" className="font-bold">
-                FILES
-              </Button>
-            </Dropdown>
+            <CommandButton menuProps={menuProps}>FILES</CommandButton>
           </div>
         }
         content={<Content />}
         preview={<Preview />}
       />
-      <Modal
-        title="Save as"
-        open={visible}
-        onCancel={() => hide()}
-        onOk={() => handleGenerate()}>
-        <Form form={form} labelCol={{ span: 8 }}>
-          <Form.Item
-            label="File name"
-            name="filename"
-            rules={[{ required: true }]}>
-            <Input
-              onChange={(evt) => {
-                const filename = evt.target.value;
-                form.setFieldsValue({ filename });
-              }}
-            />
-          </Form.Item>
 
-          <Form.Item
-            label={
-              <Button type="dashed" onClick={() => handleSaveTo()}>
-                Select directory
-              </Button>
-            }
-            name="saveto"
-            rules={[{ required: true }]}>
-            <Input disabled value={form.getFieldValue("saveto")} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <Dialog
+        hidden={!visible}
+        onDismiss={toggleVisible}
+        dialogContentProps={{
+          type: DialogType.largeHeader,
+          title: "Save as",
+        }}
+        modalProps={{ isBlocking: true }}>
+        <Controller
+          name="filename"
+          control={form.control}
+          render={({ field }) => {
+            return <TextField label="File name" required {...field} />;
+          }}
+        />
+
+        <DefaultButton onClick={() => handleSaveTo()}>
+          Select directory
+        </DefaultButton>
+        <Controller
+          control={form.control}
+          render={({ field }) => {
+            return <TextField required disabled {...field} />;
+          }}
+          name="saveto"
+        />
+
+        <DialogFooter>
+          <PrimaryButton
+            disabled={!formValues.filename || !formValues.saveto}
+            onClick={() => handleGenerate()}
+            text="Save"
+          />
+          <DefaultButton onClick={() => toggleVisible(false)} text="Cancel" />
+        </DialogFooter>
+      </Dialog>
     </AppContext.Provider>
   );
 }
