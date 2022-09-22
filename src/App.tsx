@@ -151,7 +151,7 @@ function App() {
           }}
         />
 
-        <DefaultButton onClick={() => handleSaveTo()}>
+        <DefaultButton className="mt-3 mb-1" onClick={() => handleSaveTo()}>
           Select directory
         </DefaultButton>
         <Controller
