@@ -4,9 +4,9 @@ import { Preview } from "./Preview";
 import { AppContext, useStoreCreation } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
-import { emit } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 import { useRef } from "react";
-import { useBoolean } from "react-use";
+import { useBoolean, useAsync } from "react-use";
 import {
   CommandButton,
   DefaultButton,
@@ -15,6 +15,7 @@ import {
   DialogType,
   type IContextualMenuProps,
   PrimaryButton,
+  Spinner,
   TextField,
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
@@ -31,6 +32,18 @@ function App() {
   const emptySelection = useStore((st) => !st.items.length).store;
 
   const [visible, toggleVisible] = useBoolean(false);
+  const [generating, setGenerating] = useBoolean(false);
+
+  useAsync(async () => {
+    const handler: Parameters<typeof listen>[1] = () => {
+      setGenerating(false);
+      toggleVisible(false);
+    };
+
+    const unsub = await listen("be-subcat-generate", handler);
+
+    return () => unsub();
+  }, []);
 
   const form = useForm<{ filename: string; saveto: string }>();
   const formValues = form.watch();
@@ -66,11 +79,12 @@ function App() {
     }
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = () => {
     const { saveto, filename } = formValues;
     const items = getValue().items;
     if (items.length) {
-      await emit("fe-subcat-generate", {
+      setGenerating(true);
+      emit("fe-subcat-generate", {
         imgs: items.map((it) => {
           const { url, middle, bottom, width, height } = it;
 
@@ -85,6 +99,8 @@ function App() {
         }),
         dir: saveto,
         filename,
+      }).catch(() => {
+        setGenerating(false);
       });
     }
   };
@@ -147,11 +163,21 @@ function App() {
           name="filename"
           control={form.control}
           render={({ field }) => {
-            return <TextField label="File name" required {...field} />;
+            return (
+              <TextField
+                disabled={generating}
+                label="File name"
+                required
+                {...field}
+              />
+            );
           }}
         />
 
-        <DefaultButton className="mt-3 mb-1" onClick={() => handleSaveTo()}>
+        <DefaultButton
+          disabled={generating}
+          className="mt-3 mb-1"
+          onClick={() => handleSaveTo()}>
           Select directory
         </DefaultButton>
         <Controller
@@ -164,11 +190,17 @@ function App() {
 
         <DialogFooter>
           <PrimaryButton
-            disabled={!formValues.filename || !formValues.saveto}
-            onClick={() => handleGenerate()}
-            text="Save"
+            className="align-top"
+            disabled={!formValues.filename || !formValues.saveto || generating}
+            onClick={() => handleGenerate()}>
+            {generating && <Spinner className="mr-1.5" />}
+            <span>Save</span>
+          </PrimaryButton>
+          <DefaultButton
+            disabled={generating}
+            onClick={() => toggleVisible(false)}
+            text="Cancel"
           />
-          <DefaultButton onClick={() => toggleVisible(false)} text="Cancel" />
         </DialogFooter>
       </Dialog>
     </AppContext.Provider>
