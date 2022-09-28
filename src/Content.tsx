@@ -3,56 +3,43 @@ import { useAppContext } from "./store";
 
 function Content() {
   const { useStore } = useAppContext();
-  const { store: items, setStore } = useStore((st) => st.items);
+  const { store: selectedItem, setStore } = useStore((st) =>
+    st.selected === undefined ? undefined : st.items[st.selected],
+  );
+
+  if (!selectedItem) {
+    return null;
+  }
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
-      {items.map((it, i) => {
-        return (
-          <Selector
-            key={it.id}
-            item={it}
-            setHeights={(factory) => {
-              setStore((st) => {
-                return {
-                  ...st,
-                  items: [
-                    ...items.slice(0, i),
-                    { ...it, ...factory(it) },
-                    ...items.slice(i + 1),
-                  ],
-                };
-              });
-            }}>
-            <img
-              src={it.src}
-              alt=""
-              onLoad={(evt) => {
-                setStore((st) => {
-                  return {
-                    ...st,
-                    items: [
-                      ...items.slice(0, i),
-                      {
-                        ...it,
-                        height: evt.currentTarget.naturalHeight,
-                        width: evt.currentTarget.naturalWidth,
-                      },
-                      ...items.slice(i + 1),
-                    ],
-                  };
-                });
-              }}
-              style={{
-                width: "100%",
-                objectFit: "contain",
-                objectPosition: "bottom",
-                display: "block", // Remove extra 4px from baseline to bottom. Also, we can set vertical-align: top to fix this.
-              }}
-            />
-          </Selector>
-        );
-      })}
+    <div className="h-full overflow-auto">
+      <Selector
+        key={selectedItem.id}
+        item={selectedItem}
+        setHeights={(factory) => {
+          setStore((st) => {
+            const index = st.items.findIndex((it) => it === selectedItem);
+            return {
+              ...st,
+              items: [
+                ...st.items.slice(0, index),
+                { ...selectedItem, ...factory(selectedItem) },
+                ...st.items.slice(index + 1),
+              ],
+            };
+          });
+        }}>
+        <img
+          src={selectedItem.src}
+          alt=""
+          style={{
+            width: "100%",
+            objectFit: "contain",
+            objectPosition: "bottom",
+            display: "block", // Remove extra 4px from baseline to bottom. Also, we can set vertical-align: top to fix this.
+          }}
+        />
+      </Selector>
     </div>
   );
 }

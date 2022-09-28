@@ -10,4 +10,5 @@ export interface Item {
 
 export interface Store {
   items: Item[];
+  selected?: number;
 }

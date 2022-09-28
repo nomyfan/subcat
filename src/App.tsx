@@ -19,6 +19,7 @@ import {
   TextField,
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
+import { ThumbnailList } from "./ThumbnaiList";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -62,6 +63,7 @@ function App() {
         batch.current++;
         return {
           ...st,
+          selectedItem: undefined,
           items: fileUrls.map((url, i) => {
             const src = convertFileSrc(url);
             return {
@@ -147,8 +149,9 @@ function App() {
             <CommandButton menuProps={menuProps}>FILES</CommandButton>
           </div>
         }
-        content={<Content />}
-        preview={<Preview />}
+        left={<ThumbnailList />}
+        middle={<Content />}
+        right={<Preview />}
       />
 
       <Dialog
