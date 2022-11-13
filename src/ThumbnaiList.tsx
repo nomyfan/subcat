@@ -23,9 +23,8 @@ function ThumbnailList() {
             key={it.id}
             src={it.src}
             onLoad={(evt) => {
-              setStore((st) => {
+              setStore(() => {
                 return {
-                  ...st,
                   items: [
                     ...items.slice(0, index),
                     {
@@ -38,7 +37,7 @@ function ThumbnailList() {
                 };
               });
             }}
-            onClick={() => setStore((st) => ({ ...st, selected: index }))}
+            onClick={() => setStore(() => ({ selected: index }))}
           />
         );
       })}

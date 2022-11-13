@@ -20,7 +20,6 @@ function Content() {
           setStore((st) => {
             const index = st.items.findIndex((it) => it === selectedItem);
             return {
-              ...st,
               items: [
                 ...st.items.slice(0, index),
                 { ...selectedItem, ...factory(selectedItem) },

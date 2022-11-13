@@ -21,7 +21,7 @@
     "react-hook-form": "^7.35.0",
     "react-use": "^17.4.0",
     "rxjs": "^7.5.5",
-    "rxtore": "^0.0.5"
+    "rxtore": "0.0.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
