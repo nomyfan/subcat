@@ -1,11 +1,10 @@
-import { useAppContext } from "./store";
+import { useAppStore } from "./store";
 
 function ThumbnailList() {
-  const { useStore } = useAppContext();
   const {
     store: { items, selected },
     setStore,
-  } = useStore(
+  } = useAppStore(
     (st) => ({ items: st.items, selected: st.selected }),
     (prev, cur) => {
       return prev.items === cur.items && prev.selected === cur.selected;

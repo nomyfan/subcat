@@ -1,9 +1,8 @@
 import { Selector } from "./Selector";
-import { useAppContext } from "./store";
+import { useAppStore } from "./store";
 
 function Content() {
-  const { useStore } = useAppContext();
-  const { store: selectedItem, setStore } = useStore((st) =>
+  const { store: selectedItem, setStore } = useAppStore((st) =>
     st.selected === undefined ? undefined : st.items[st.selected],
   );
 

@@ -17,8 +17,7 @@ function useStoreCreation() {
 
 const AppContext = createContext<ReturnType<typeof create>>(create());
 
-function useAppContext() {
-  return useContext(AppContext);
-}
+const useAppStore: ReturnType<typeof create>["useStore"] = (...args) =>
+  useContext(AppContext).useStore(...args);
 
-export { useStoreCreation, useAppContext, AppContext };
+export { useStoreCreation, AppContext, useAppStore };

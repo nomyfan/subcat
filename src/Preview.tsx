@@ -1,4 +1,4 @@
-import { useAppContext } from "./store";
+import { useAppStore } from "./store";
 import type { Item } from "./types";
 import { useMeasure } from "react-use";
 
@@ -30,10 +30,7 @@ function PreviewItem(props: { item: Item }) {
 }
 
 function Preview() {
-  const { useStore } = useAppContext();
-
-  const { store: items } = useStore((st) => st.items);
-  console.log("__DEBUG__ preview items", items);
+  const { store: items } = useAppStore((st) => st.items);
 
   return (
     <div>
