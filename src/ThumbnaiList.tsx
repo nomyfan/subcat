@@ -1,14 +1,12 @@
-import { useAppStore } from "./store";
+import { useAppStore, shallow } from "./store";
 
 function ThumbnailList() {
   const {
-    store: { items, selected },
-    setStore,
+    state: { items, selected },
+    actions,
   } = useAppStore(
     (st) => ({ items: st.items, selected: st.selected }),
-    (prev, cur) => {
-      return prev.items === cur.items && prev.selected === cur.selected;
-    },
+    shallow,
   );
 
   return (
@@ -22,21 +20,15 @@ function ThumbnailList() {
             key={it.id}
             src={it.src}
             onLoad={(evt) => {
-              setStore(() => {
+              actions.updateItem(index, (item) => {
                 return {
-                  items: [
-                    ...items.slice(0, index),
-                    {
-                      ...it,
-                      height: evt.currentTarget.naturalHeight,
-                      width: evt.currentTarget.naturalWidth,
-                    },
-                    ...items.slice(index + 1),
-                  ],
+                  ...item,
+                  height: evt.currentTarget.naturalHeight,
+                  width: evt.currentTarget.naturalWidth,
                 };
               });
             }}
-            onClick={() => setStore(() => ({ selected: index }))}
+            onClick={() => actions.selectItem(index)}
           />
         );
       })}

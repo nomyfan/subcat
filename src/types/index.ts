@@ -8,7 +8,7 @@ export interface Item {
   height: number;
 }
 
-export interface Store {
+export interface StoreState {
   items: Item[];
   selected?: number;
 }

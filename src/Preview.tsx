@@ -1,4 +1,4 @@
-import { useAppStore } from "./store";
+import { useAppStoreState } from "./store";
 import type { Item } from "./types";
 import { useMeasure } from "react-use";
 
@@ -30,7 +30,7 @@ function PreviewItem(props: { item: Item }) {
 }
 
 function Preview() {
-  const { store: items } = useAppStore((st) => st.items);
+  const items = useAppStoreState((st) => st.items);
 
   return (
     <div>
