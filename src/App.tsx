@@ -211,7 +211,7 @@ function App() {
   );
 }
 
-export default function AppWithState() {
+export default function AppWithStore() {
   const store = useStoreCreation();
   return (
     <AppContext.Provider value={store}>
