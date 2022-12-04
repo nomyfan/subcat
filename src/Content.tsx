@@ -2,7 +2,7 @@ import { Selector } from "./Selector";
 import { useAppStore } from "./store";
 
 function Content() {
-  const { store: selectedItem, setStore } = useAppStore((st) =>
+  const { state: selectedItem, actions } = useAppStore((st) =>
     st.selected === undefined ? undefined : st.items[st.selected],
   );
 
@@ -16,15 +16,8 @@ function Content() {
         key={selectedItem.id}
         item={selectedItem}
         setHeights={(factory) => {
-          setStore((st) => {
-            const index = st.items.findIndex((it) => it === selectedItem);
-            return {
-              items: [
-                ...st.items.slice(0, index),
-                { ...selectedItem, ...factory(selectedItem) },
-                ...st.items.slice(index + 1),
-              ],
-            };
+          actions.updateSelectedItem((item) => {
+            return { ...item, ...factory(item) };
           });
         }}>
         <img

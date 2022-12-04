@@ -23,11 +23,10 @@ specifiers:
   react-dom: ^17
   react-hook-form: ^7.35.0
   react-use: ^17.4.0
-  rxjs: ^7.5.5
-  rxtore: 0.0.6
   tailwindcss: ^3.1.8
   typescript: ^4.6.3
   vite: ^2.9.9
+  zustand: ^4.1.4
 
 dependencies:
   '@fluentui/react': 8.96.0_itbvd6nzuoidgzct3pixmtsxhi
@@ -36,8 +35,7 @@ dependencies:
   react-dom: 17.0.2_react@17.0.2
   react-hook-form: 7.35.0_react@17.0.2
   react-use: 17.4.0_sfoxds7t5ydpegc3knd667wn6m
-  rxjs: 7.5.5
-  rxtore: 0.0.6_react@17.0.2+rxjs@7.5.5
+  zustand: 4.1.4_react@17.0.2
 
 devDependencies:
   '@commitlint/cli': 17.0.3
@@ -3381,22 +3379,6 @@ packages:
       queue-microtask: 1.2.3
     dev: true
 
-  /rxjs/7.5.5:
-    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
-    dependencies:
-      tslib: 2.4.0
-    dev: false
-
-  /rxtore/0.0.6_react@17.0.2+rxjs@7.5.5:
-    resolution: {integrity: sha512-OI2gJrJ52NzJQzX8NmK0Xzij9VflNqGW29bYA1CCqe+lDPOOTR6Dm4zuURfaNzsV8idWqM1CKOUqfg7d4DW7Rg==}
-    peerDependencies:
-      react: ^17.0.0
-      rxjs: ^7.5.5
-    dependencies:
-      react: 17.0.2
-      rxjs: 7.5.5
-    dev: false
-
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
     dev: true
@@ -3862,6 +3844,14 @@ packages:
       punycode: 2.1.1
     dev: true
 
+  /use-sync-external-store/1.2.0_react@17.0.2:
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+    dev: false
+
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: true
@@ -3992,3 +3982,19 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zustand/4.1.4_react@17.0.2:
+    resolution: {integrity: sha512-k2jVOlWo8p4R83mQ+/uyB8ILPO2PCJOf+QVjcL+1PbMCk1w5OoPYpAIxy9zd93FSfmJqoH6lGdwzzjwqJIRU5A==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      react: 17.0.2
+      use-sync-external-store: 1.2.0_react@17.0.2
+    dev: false

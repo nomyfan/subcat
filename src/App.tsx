@@ -1,7 +1,7 @@
 import { Layout } from "./Layout";
 import { Content } from "./Content";
 import { Preview } from "./Preview";
-import { AppContext, useStoreCreation } from "./store";
+import { AppContext, useAppStore, useStoreCreation } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
@@ -27,10 +27,12 @@ function valueInRange(value: number, min = 0, max = 100) {
 
 function App() {
   const batch = useRef(0);
-  const store = useStoreCreation();
-  const { getValue, useStore } = store;
 
-  const emptySelection = useStore((st) => !st.items.length).store;
+  const {
+    state: emptySelection,
+    getStoreState,
+    setStoreState,
+  } = useAppStore((st) => !st.items.length);
 
   const [visible, toggleVisible] = useBoolean(false);
   const [generating, setGenerating] = useBoolean(false);
@@ -59,11 +61,10 @@ function App() {
     });
     if (files) {
       const fileUrls = Array.isArray(files) ? files : [files];
-      store.next((st) => {
+      setStoreState(() => {
         batch.current++;
         return {
-          ...st,
-          selectedItem: undefined,
+          selected: undefined,
           items: fileUrls.map((url, i) => {
             const src = convertFileSrc(url);
             return {
@@ -83,7 +84,7 @@ function App() {
 
   const handleGenerate = () => {
     const { saveto, filename } = formValues;
-    const items = getValue().items;
+    const items = getStoreState().items;
     if (items.length) {
       setGenerating(true);
       emit("fe-subcat-generate", {
@@ -142,7 +143,7 @@ function App() {
   };
 
   return (
-    <AppContext.Provider value={store}>
+    <>
       <Layout
         head={
           <div className="bg-gray-100">
@@ -206,8 +207,15 @@ function App() {
           />
         </DialogFooter>
       </Dialog>
-    </AppContext.Provider>
+    </>
   );
 }
 
-export default App;
+export default function AppWithStore() {
+  const store = useStoreCreation();
+  return (
+    <AppContext.Provider value={store}>
+      <App />
+    </AppContext.Provider>
+  );
+}
