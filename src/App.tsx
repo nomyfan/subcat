@@ -5,7 +5,6 @@ import { AppContext, useAppStore, useStoreCreation } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
-import { useRef } from "react";
 import { useBoolean, useAsync } from "react-use";
 import {
   CommandButton,
@@ -26,8 +25,6 @@ function valueInRange(value: number, min = 0, max = 100) {
 }
 
 function App() {
-  const batch = useRef(0);
-
   const {
     state: emptySelection,
     getStoreState,
@@ -56,27 +53,30 @@ function App() {
       multiple: true,
       directory: false,
       recursive: false,
-      title: "Select images",
+      title: "Open",
       filters: [{ name: "images", extensions: ["jpg", "jpeg", "png"] }],
     });
     if (files) {
       const fileUrls = Array.isArray(files) ? files : [files];
-      setStoreState(() => {
-        batch.current++;
-        return {
-          selected: undefined,
-          items: fileUrls.map((url, i) => {
+      setStoreState((st) => {
+        const newItems = fileUrls
+          .filter((url) => {
+            return !st.items.find((it) => it.url === url);
+          })
+          .map((url, i) => {
             const src = convertFileSrc(url);
             return {
-              id: `${src}_${i}_${batch.current}`,
+              id: url,
               url,
               src,
               height: 0,
               width: 0,
-              middle: i === 0 ? 100 : 10,
+              middle: i === 0 && st.items.length === 0 ? 100 : 10,
               bottom: 0,
             };
-          }),
+          });
+        return {
+          items: st.items.concat(newItems),
         };
       });
     }
@@ -125,7 +125,7 @@ function App() {
     items: [
       {
         key: "select_images",
-        text: "Select images",
+        text: "Open",
         onClick: () => {
           handleSelectImages();
         },
