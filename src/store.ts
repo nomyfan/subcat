@@ -1,7 +1,7 @@
 import { createStore, useStore } from "zustand";
 import shallow from "zustand/shallow";
 import { createContext, useContext, useRef } from "react";
-import type { StoreState, Item } from "./types";
+import type { StoreState, Item, Index } from "./types";
 
 function create() {
   const storeApi = createStore<StoreState>(() => {
@@ -32,6 +32,16 @@ function create() {
     updateItem(selected, factory);
   };
 
+  const moveItem = (from: Index, to: Index) => {
+    const items = storeApi.getState().items.slice();
+    const target = items.splice(from, 1);
+    items.splice(to, 0, ...target);
+
+    storeApi.setState(() => {
+      return { items };
+    });
+  };
+
   return {
     storeApi,
     actions: {
@@ -43,6 +53,7 @@ function create() {
       },
       updateItem,
       updateSelectedItem,
+      moveItem,
     },
   };
 }

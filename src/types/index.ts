@@ -12,3 +12,5 @@ export interface StoreState {
   items: Item[];
   selected?: number;
 }
+
+export type Index = number;

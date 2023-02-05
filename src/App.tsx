@@ -76,6 +76,7 @@ function App() {
             };
           });
         return {
+          selected: st.selected ?? 0,
           items: st.items.concat(newItems),
         };
       });
