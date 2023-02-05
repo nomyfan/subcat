@@ -19,6 +19,11 @@ import {
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
+import { Trash } from "./Trash";
+import {
+  DragDropContext,
+  type DragDropContextProps,
+} from "react-beautiful-dnd";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -29,6 +34,7 @@ function App() {
     state: emptySelection,
     getStoreState,
     setStoreState,
+    actions,
   } = useAppStore((st) => !st.items.length);
 
   const [visible, toggleVisible] = useBoolean(false);
@@ -143,8 +149,33 @@ function App() {
     ],
   };
 
+  const handleDragStart: DragDropContextProps["onBeforeCapture"] = () => {
+    actions.toggleDragging(true);
+  };
+
+  const handleDragEnd: DragDropContextProps["onDragEnd"] = (evt) => {
+    if (!evt.destination) {
+      return;
+    }
+
+    const {
+      source: { index: fromIndex },
+      destination: { index: toIndex },
+    } = evt;
+
+    if (evt.destination.droppableId === "trash") {
+      actions.deleteItem(fromIndex);
+    } else {
+      actions.moveItem(fromIndex, toIndex);
+    }
+
+    actions.toggleDragging(false);
+  };
+
   return (
-    <>
+    <DragDropContext
+      onBeforeCapture={handleDragStart}
+      onDragEnd={handleDragEnd}>
       <Layout
         head={
           <div className="bg-gray-100">
@@ -208,7 +239,9 @@ function App() {
           />
         </DialogFooter>
       </Dialog>
-    </>
+
+      <Trash />
+    </DragDropContext>
   );
 }
 
