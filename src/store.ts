@@ -1,11 +1,11 @@
 import { createStore, useStore } from "zustand";
 import shallow from "zustand/shallow";
 import { createContext, useContext, useRef } from "react";
-import type { StoreState, Item } from "./types";
+import type { StoreState, Item, Index } from "./types";
 
 function create() {
   const storeApi = createStore<StoreState>(() => {
-    return { items: [] };
+    return { items: [], dragging: false };
   });
 
   const updateItem = (index: number, factory: (item: Item) => Item) => {
@@ -32,6 +32,29 @@ function create() {
     updateItem(selected, factory);
   };
 
+  const moveItem = (from: Index, to: Index) => {
+    const items = storeApi.getState().items.slice();
+    const target = items.splice(from, 1);
+    items.splice(to, 0, ...target);
+
+    storeApi.setState({ items });
+  };
+
+  const deleteItem = (index: Index) => {
+    const items = storeApi.getState().items.slice();
+    items.splice(index, 1);
+
+    storeApi.setState({ items });
+  };
+
+  const toggleDragging = (dragging?: boolean) => {
+    if (dragging === undefined) {
+      storeApi.setState({ dragging: !storeApi.getState().dragging });
+    } else {
+      storeApi.setState({ dragging });
+    }
+  };
+
   return {
     storeApi,
     actions: {
@@ -43,6 +66,9 @@ function create() {
       },
       updateItem,
       updateSelectedItem,
+      moveItem,
+      deleteItem,
+      toggleDragging,
     },
   };
 }

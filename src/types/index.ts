@@ -10,5 +10,8 @@ export interface Item {
 
 export interface StoreState {
   items: Item[];
+  dragging: boolean;
   selected?: number;
 }
+
+export type Index = number;

@@ -5,7 +5,6 @@ import { AppContext, useAppStore, useStoreCreation } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
-import { useRef } from "react";
 import { useBoolean, useAsync } from "react-use";
 import {
   CommandButton,
@@ -20,18 +19,22 @@ import {
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
+import { Trash } from "./Trash";
+import {
+  DragDropContext,
+  type DragDropContextProps,
+} from "react-beautiful-dnd";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
 }
 
 function App() {
-  const batch = useRef(0);
-
   const {
     state: emptySelection,
     getStoreState,
     setStoreState,
+    actions,
   } = useAppStore((st) => !st.items.length);
 
   const [visible, toggleVisible] = useBoolean(false);
@@ -56,29 +59,38 @@ function App() {
       multiple: true,
       directory: false,
       recursive: false,
-      title: "Select images",
+      title: "Open",
       filters: [{ name: "images", extensions: ["jpg", "jpeg", "png"] }],
     });
     if (files) {
       const fileUrls = Array.isArray(files) ? files : [files];
-      setStoreState(() => {
-        batch.current++;
-        return {
-          selected: undefined,
-          items: fileUrls.map((url, i) => {
-            const src = convertFileSrc(url);
-            return {
-              id: `${src}_${i}_${batch.current}`,
-              url,
-              src,
-              height: 0,
-              width: 0,
-              middle: i === 0 ? 100 : 10,
-              bottom: 0,
-            };
-          }),
-        };
-      });
+      const items = getStoreState().items;
+
+      const newItems = fileUrls
+        .filter((url) => {
+          return !items.find((it) => it.url === url);
+        })
+        .map((url, i) => {
+          const src = convertFileSrc(url);
+          return {
+            id: url,
+            url,
+            src,
+            height: 0,
+            width: 0,
+            middle: i === 0 && items.length === 0 ? 100 : 10,
+            bottom: 0,
+          };
+        });
+
+      if (newItems.length) {
+        setStoreState((st) => {
+          return {
+            selected: st.selected ?? 0,
+            items: st.items.concat(newItems),
+          };
+        });
+      }
     }
   };
 
@@ -125,7 +137,7 @@ function App() {
     items: [
       {
         key: "select_images",
-        text: "Select images",
+        text: "Open",
         onClick: () => {
           handleSelectImages();
         },
@@ -142,8 +154,33 @@ function App() {
     ],
   };
 
+  const handleDragStart: DragDropContextProps["onBeforeCapture"] = () => {
+    actions.toggleDragging(true);
+  };
+
+  const handleDragEnd: DragDropContextProps["onDragEnd"] = (evt) => {
+    if (!evt.destination) {
+      return;
+    }
+
+    const {
+      source: { index: fromIndex },
+      destination: { index: toIndex },
+    } = evt;
+
+    if (evt.destination.droppableId === "trash") {
+      actions.deleteItem(fromIndex);
+    } else {
+      actions.moveItem(fromIndex, toIndex);
+    }
+
+    actions.toggleDragging(false);
+  };
+
   return (
-    <>
+    <DragDropContext
+      onBeforeCapture={handleDragStart}
+      onDragEnd={handleDragEnd}>
       <Layout
         head={
           <div className="bg-gray-100">
@@ -207,7 +244,9 @@ function App() {
           />
         </DialogFooter>
       </Dialog>
-    </>
+
+      <Trash />
+    </DragDropContext>
   );
 }
 
