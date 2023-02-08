@@ -1,8 +1,8 @@
 import { Droppable } from "react-beautiful-dnd";
-import { useAppStore } from "./store";
+import { useAppStoreState } from "./store";
 
 function Trash() {
-  const { state: dragging } = useAppStore((st) => st.dragging);
+  const dragging = useAppStoreState((st) => st.dragging);
 
   return (
     <Droppable droppableId="trash">
