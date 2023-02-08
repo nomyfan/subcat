@@ -64,28 +64,33 @@ function App() {
     });
     if (files) {
       const fileUrls = Array.isArray(files) ? files : [files];
-      setStoreState((st) => {
-        const newItems = fileUrls
-          .filter((url) => {
-            return !st.items.find((it) => it.url === url);
-          })
-          .map((url, i) => {
-            const src = convertFileSrc(url);
-            return {
-              id: url,
-              url,
-              src,
-              height: 0,
-              width: 0,
-              middle: i === 0 && st.items.length === 0 ? 100 : 10,
-              bottom: 0,
-            };
-          });
-        return {
-          selected: st.selected ?? 0,
-          items: st.items.concat(newItems),
-        };
-      });
+      const items = getStoreState().items;
+
+      const newItems = fileUrls
+        .filter((url) => {
+          return !items.find((it) => it.url === url);
+        })
+        .map((url, i) => {
+          const src = convertFileSrc(url);
+          return {
+            id: url,
+            url,
+            src,
+            height: 0,
+            width: 0,
+            middle: i === 0 && items.length === 0 ? 100 : 10,
+            bottom: 0,
+          };
+        });
+
+      if (newItems.length) {
+        setStoreState((st) => {
+          return {
+            selected: st.selected ?? 0,
+            items: st.items.concat(newItems),
+          };
+        });
+      }
     }
   };
 
