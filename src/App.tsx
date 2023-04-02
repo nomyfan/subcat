@@ -20,10 +20,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
 import { Trash } from "./Trash";
-import {
-  DragDropContext,
-  type DragDropContextProps,
-} from "react-beautiful-dnd";
+import { DragDropContext, type DragDropContextProps } from "@hello-pangea/dnd";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
