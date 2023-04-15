@@ -1,6 +1,7 @@
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import classNames from "classnames";
-import { useAppStore, shallow } from "./store";
+import { useAppStore } from "./hooks";
+import { shallow } from "./store";
 
 function ThumbnailList() {
   const {

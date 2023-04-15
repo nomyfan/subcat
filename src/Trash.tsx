@@ -1,5 +1,5 @@
 import { Droppable } from "@hello-pangea/dnd";
-import { useAppStoreState } from "./store";
+import { useAppStoreState } from "./hooks";
 
 function Trash() {
   const dragging = useAppStoreState((st) => st.dragging);

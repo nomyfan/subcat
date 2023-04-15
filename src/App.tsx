@@ -1,7 +1,8 @@
 import { Layout } from "./Layout";
 import { Content } from "./Content";
 import { Preview } from "./Preview";
-import { AppContext, useAppStore, useStoreCreation } from "./store";
+import { AppStoreProvider } from "./AppStoreProvider";
+import { useAppStore } from "./hooks";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
@@ -248,10 +249,9 @@ function App() {
 }
 
 export default function AppWithStore() {
-  const store = useStoreCreation();
   return (
-    <AppContext.Provider value={store}>
+    <AppStoreProvider>
       <App />
-    </AppContext.Provider>
+    </AppStoreProvider>
   );
 }

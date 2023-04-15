@@ -1,4 +1,4 @@
-import { useAppStoreState } from "./store";
+import { useAppStoreState } from "./hooks";
 import type { Item } from "./types";
 import { useMeasure } from "react-use";
 

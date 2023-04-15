@@ -1,14 +1,15 @@
-import { createStore, useStore } from "zustand";
+import { StoreApi, createStore } from "zustand";
 import shallow from "zustand/shallow";
 import { produce } from "immer";
-import { createContext, useContext, useRef } from "react";
 import type { StoreState, Item, Index } from "./types";
 
-function create() {
-  const storeApi = createStore<StoreState>(() => {
+function createStoreState(): StoreApi<StoreState> {
+  return createStore<StoreState>(() => {
     return { items: [], dragging: false };
   });
+}
 
+function createStoreActions(storeApi: StoreApi<StoreState>) {
   const setStoreState = (factory: (state: StoreState) => void) => {
     storeApi.setState(produce(factory));
   };
@@ -55,66 +56,24 @@ function create() {
   };
 
   return {
-    storeApi,
-    actions: {
-      selectItem: (index: number) => {
-        setStoreState((state) => {
-          if (index < 0 || index >= state.items.length) {
-            return;
-          }
-          state.selected = index;
-        });
-      },
-      updateItem,
-      updateSelectedItem,
-      moveItem,
-      deleteItem,
-      toggleDragging,
+    selectItem: (index: number) => {
+      setStoreState((state) => {
+        if (index < 0 || index >= state.items.length) {
+          return;
+        }
+        state.selected = index;
+      });
     },
+    updateItem,
+    updateSelectedItem,
+    moveItem,
+    deleteItem,
+    toggleDragging,
   };
 }
 
-function useStoreCreation() {
-  const ref = useRef<{ value: ReturnType<typeof create> }>();
-  if (!ref.current) {
-    ref.current = { value: create() };
-  }
+type IStoreActions = ReturnType<typeof createStoreActions>;
 
-  return ref.current!.value;
-}
+export type { IStoreActions };
 
-const AppContext = createContext<ReturnType<typeof create>>(create());
-
-const useAppContext = () => useContext(AppContext);
-
-function useAppStore<U>(
-  selector: (state: StoreState) => U,
-  equalityFn?: (prev: U, cur: U) => boolean,
-) {
-  const { storeApi, actions } = useAppContext();
-  const state = useStore(storeApi, selector, equalityFn);
-
-  return {
-    state,
-    actions,
-    storeApi,
-    setStoreState: storeApi.setState,
-    getStoreState: storeApi.getState,
-  };
-}
-
-function useAppStoreState<U>(
-  selector: (state: StoreState) => U,
-  equalityFn?: (prev: U, cur: U) => boolean,
-) {
-  return useAppStore(selector, equalityFn).state;
-}
-
-export {
-  useStoreCreation,
-  AppContext,
-  useAppStore,
-  useAppStoreState,
-  useAppContext,
-  shallow,
-};
+export { shallow, createStoreState, createStoreActions };

@@ -1,5 +1,5 @@
 import { Selector } from "./Selector";
-import { useAppStore } from "./store";
+import { useAppStore } from "./hooks";
 
 function Content() {
   const { state: selectedItem, actions } = useAppStore((st) =>
