@@ -1,5 +1,6 @@
 import { createStore, useStore } from "zustand";
 import shallow from "zustand/shallow";
+import { produce } from "immer";
 import { createContext, useContext, useRef } from "react";
 import type { StoreState, Item, Index } from "./types";
 
@@ -8,18 +9,18 @@ function create() {
     return { items: [], dragging: false };
   });
 
+  const setStoreState = (factory: (state: StoreState) => void) => {
+    storeApi.setState(produce(factory));
+  };
+
   const updateItem = (index: number, factory: (item: Item) => Item) => {
     const { items } = storeApi.getState();
     if (index < 0 || index >= items.length) {
       return;
     }
 
-    storeApi.setState({
-      items: [
-        ...items.slice(0, index),
-        { ...items[index], ...factory(items[index]) },
-        ...items.slice(index + 1),
-      ],
+    setStoreState((state) => {
+      state.items[index] = factory(state.items[index]);
     });
   };
 
@@ -33,23 +34,21 @@ function create() {
   };
 
   const moveItem = (from: Index, to: Index) => {
-    const items = storeApi.getState().items.slice();
-    const target = items.splice(from, 1);
-    items.splice(to, 0, ...target);
-
-    storeApi.setState({ items });
+    setStoreState((state) => {
+      const target = state.items.splice(from, 1);
+      state.items.splice(to, 0, ...target);
+    });
   };
 
   const deleteItem = (index: Index) => {
-    const items = storeApi.getState().items.slice();
-    items.splice(index, 1);
-
-    storeApi.setState({ items });
+    setStoreState((state) => {
+      state.items.splice(index, 1);
+    });
   };
 
   const toggleDragging = (dragging?: boolean) => {
     if (dragging === undefined) {
-      storeApi.setState({ dragging: !storeApi.getState().dragging });
+      setStoreState((state) => ({ dragging: !state.dragging }));
     } else {
       storeApi.setState({ dragging });
     }
@@ -59,10 +58,12 @@ function create() {
     storeApi,
     actions: {
       selectItem: (index: number) => {
-        if (index < 0 || index >= storeApi.getState().items.length) {
-          return;
-        }
-        storeApi.setState({ selected: index });
+        setStoreState((state) => {
+          if (index < 0 || index >= state.items.length) {
+            return;
+          }
+          state.selected = index;
+        });
       },
       updateItem,
       updateSelectedItem,

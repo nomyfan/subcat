@@ -19,6 +19,7 @@ specifiers:
   eslint-plugin-react: ^7.26.1
   eslint-plugin-react-hooks: ^4.2.0
   husky: ^8.0.1
+  immer: ^9.0.21
   postcss: ^8.4.16
   prettier: ^2.7.1
   react: ^17
@@ -35,11 +36,12 @@ dependencies:
   '@hello-pangea/dnd': 16.2.0_itbvd6nzuoidgzct3pixmtsxhi
   '@tauri-apps/api': 1.1.0
   classnames: 2.3.2
+  immer: 9.0.21
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-hook-form: 7.35.0_react@17.0.2
   react-use: 17.4.0_sfoxds7t5ydpegc3knd667wn6m
-  zustand: 4.1.4_react@17.0.2
+  zustand: 4.1.4_immer@9.0.21+react@17.0.2
 
 devDependencies:
   '@commitlint/cli': 17.0.3
@@ -2458,6 +2460,10 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immer/9.0.21:
+    resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
+    dev: false
+
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -4109,7 +4115,7 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zustand/4.1.4_react@17.0.2:
+  /zustand/4.1.4_immer@9.0.21+react@17.0.2:
     resolution: {integrity: sha512-k2jVOlWo8p4R83mQ+/uyB8ILPO2PCJOf+QVjcL+1PbMCk1w5OoPYpAIxy9zd93FSfmJqoH6lGdwzzjwqJIRU5A==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -4121,6 +4127,7 @@ packages:
       react:
         optional: true
     dependencies:
+      immer: 9.0.21
       react: 17.0.2
       use-sync-external-store: 1.2.0_react@17.0.2
     dev: false
