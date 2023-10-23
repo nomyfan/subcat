@@ -10,28 +10,28 @@ use utils::{generate, Config};
 
 fn main() {
     tauri::Builder::default()
-        .on_page_load(|window, _| {
-            let window_ = window.clone();
-            window.get_window("main").and_then(|win| {
-                Some(win.listen("fe-subcat-generate", move |event| {
-                    println!("got fe-subcat-generate with payload {:?}", event.payload());
-                    let config: Config = serde_json::from_str(event.payload().unwrap()).unwrap();
+        .setup(|app| {
+            let main_window = app.get_window("main").unwrap();
+            let main_window_clone = main_window.clone();
+            main_window.listen("fe-subcat-generate", move |event| {
+                println!("got fe-subcat-generate with payload {:?}", event.payload());
+                let config: Config = serde_json::from_str(event.payload().unwrap()).unwrap();
 
-                    let window_ = window_.clone();
-                    async_runtime::spawn(async move {
-                        match generate(config).await {
-                            Ok(()) => {
-                                window_.emit("be-subcat-generate", "ok").unwrap();
-                                println!("Ok");
-                            }
-                            Err(err) => {
-                                window_.emit("be-subcat-generate", "error").unwrap();
-                                println!("Error {:?}", err);
-                            }
+                let main_window = main_window_clone.clone();
+                async_runtime::spawn(async move {
+                    match generate(config).await {
+                        Ok(()) => {
+                            main_window.emit("be-subcat-generate", "ok").unwrap();
+                            println!("Ok");
                         }
-                    });
-                }))
+                        Err(err) => {
+                            main_window.emit("be-subcat-generate", "error").unwrap();
+                            println!("Error {:?}", err);
+                        }
+                    }
+                });
             });
+            Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
