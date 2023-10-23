@@ -17,6 +17,7 @@ import {
   PrimaryButton,
   Spinner,
   TextField,
+  Dropdown,
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
@@ -27,6 +28,11 @@ import { nanoid } from "nanoid/non-secure";
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
 }
+
+const formatOptions = [
+  { key: "JPG", text: "JPG" },
+  { key: "PNG", text: "PNG" },
+];
 
 function App() {
   const {
@@ -50,7 +56,13 @@ function App() {
     return () => unsub();
   }, []);
 
-  const form = useForm<{ filename: string; saveto: string }>();
+  const form = useForm<{
+    filename: string;
+    saveto: string;
+    format: "JPG" | "PNG";
+  }>({
+    defaultValues: { filename: "", saveto: "", format: "JPG" },
+  });
   const formValues = form.watch();
 
   const handleSelectImages = async () => {
@@ -94,7 +106,7 @@ function App() {
   };
 
   const handleGenerate = () => {
-    const { saveto, filename } = formValues;
+    const { saveto, filename, format } = formValues;
     const items = getStoreState().items;
     if (items.length) {
       setGenerating(true);
@@ -113,6 +125,7 @@ function App() {
         }),
         dir: saveto,
         filename,
+        format,
       }).catch(() => {
         setGenerating(false);
       });
@@ -148,6 +161,8 @@ function App() {
           form.reset();
           const defaultFilename = nanoid(7);
           form.setValue("filename", defaultFilename);
+          const defaultFormat = "JPG";
+          form.setValue("format", defaultFormat);
           toggleVisible(true);
         },
         disabled: emptySelection,
@@ -211,6 +226,27 @@ function App() {
                 label="File name"
                 required
                 {...field}
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name="format"
+          control={form.control}
+          render={({ field }) => {
+            return (
+              <Dropdown
+                disabled={generating}
+                label="Format"
+                required
+                options={formatOptions}
+                selectedKey={field.value}
+                onChange={(_, opt) => {
+                  if (opt) {
+                    form.setValue("format", opt.key as "JPG" | "PNG");
+                  }
+                }}
               />
             );
           }}

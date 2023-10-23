@@ -17,10 +17,17 @@ pub(crate) struct Image {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub enum Format {
+    PNG,
+    JPG,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Config {
     pub(crate) imgs: Vec<Image>,
     pub(crate) dir: String,
     pub(crate) filename: String,
+    pub(crate) format: Format,
 }
 
 struct ImageMessage {
@@ -33,6 +40,7 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
         imgs,
         dir,
         filename,
+        format,
     } = config;
     let imgs_count = imgs.len();
 
@@ -96,8 +104,21 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     }
 
     println!("Saving...");
-    let save_to = path::Path::new(&dir[..]).join(filename + ".png");
-    final_img.save(save_to)?;
+    let save_to = path::Path::new(&dir[..]).join(
+        filename
+            + match format {
+                Format::JPG => ".jpg",
+                Format::PNG => ".png",
+            },
+    );
+
+    final_img.save_with_format(
+        save_to,
+        match format {
+            Format::PNG => image::ImageFormat::Png,
+            Format::JPG => image::ImageFormat::Jpeg,
+        },
+    )?;
 
     Ok(())
 }

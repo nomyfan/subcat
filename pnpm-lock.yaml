@@ -8,6 +8,9 @@ dependencies:
   '@fluentui/react':
     specifier: ^8.96.0
     version: 8.96.0(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)
+  '@fluentui/react-icons-mdl2':
+    specifier: ^1.3.50
+    version: 1.3.50(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)
   '@hello-pangea/dnd':
     specifier: ^16.2.0
     version: 16.2.0(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)
@@ -749,6 +752,13 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@fluentui/dom-utilities@2.2.11:
+    resolution: {integrity: sha512-2tXfg7/9PXu9nfU72/P3o3waHEFEQtHUfQbVexUaYqNNAxMj6sOfsqpUx4vd5nPgO+grSWrl+spqlLN2yej51w==}
+    dependencies:
+      '@fluentui/set-version': 8.2.11
+      tslib: 2.4.0
+    dev: false
+
   /@fluentui/dom-utilities@2.2.2:
     resolution: {integrity: sha512-puklLc6Jvg279OGagqkSfuHML6ckBhw3gJakdvIZHKeJiduh+34U4Finl3K24yBSXzG2WsN+LwLTd1Vcociy+g==}
     dependencies:
@@ -789,6 +799,13 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@fluentui/merge-styles@8.5.12:
+    resolution: {integrity: sha512-ZnUo0YuMP7AYi68dkknFqVxopIAgbrUnqR/MZlemmRvBYyy1SMj1WQeHcoiLFA8mF8YKn7B+jxQgJbN2bfcrRw==}
+    dependencies:
+      '@fluentui/set-version': 8.2.11
+      tslib: 2.4.0
+    dev: false
+
   /@fluentui/merge-styles@8.5.3:
     resolution: {integrity: sha512-bHWftN3zTp1bbBfmAEH8YK9UURWj2mffw7b7VaW2Og1qxwv3GMSza1cyv/d3EVqpMJ8AVwFv3mbi9p1ieMN9mw==}
     dependencies:
@@ -824,6 +841,40 @@ packages:
       '@types/react': 17.0.47
       react: 17.0.2
       tslib: 2.4.0
+    dev: false
+
+  /@fluentui/react-icon-provider@1.3.46(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-eCggiSFJrq+D4Y/KURThv8zLenRW2/Ubg2BGTKLIygWI5R0b5Hh85wv4wHyysTxaKqIfWKq4OOPG50QNk3AGRA==}
+    peerDependencies:
+      '@types/react': '>=16.8.0 <19.0.0'
+      '@types/react-dom': '>=16.8.0 <19.0.0'
+      react: '>=16.8.0 <19.0.0'
+      react-dom: '>=16.8.0 <19.0.0'
+    dependencies:
+      '@fluentui/set-version': 8.2.11
+      '@fluentui/style-utilities': 8.9.18(@types/react@17.0.47)(react@17.0.2)
+      '@types/react': 17.0.47
+      '@types/react-dom': 17.0.17
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
+      tslib: 2.4.0
+    dev: false
+
+  /@fluentui/react-icons-mdl2@1.3.50(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-MPI4+PCfPCEXabdWDmvv2WZuOygxoQamSQhq70fvV5jNOaDL2YZv3e94Vhtp2m8lNGxGn1Vjse/ZS7yRhWAg2w==}
+    peerDependencies:
+      react: '>=16.8.0 <19.0.0'
+    dependencies:
+      '@fluentui/react-icon-provider': 1.3.46(@types/react-dom@17.0.17)(@types/react@17.0.47)(react-dom@17.0.2)(react@17.0.2)
+      '@fluentui/set-version': 8.2.11
+      '@fluentui/utilities': 8.13.19(@types/react@17.0.47)(react@17.0.2)
+      '@microsoft/load-themed-styles': 1.10.295
+      react: 17.0.2
+      tslib: 2.4.0
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
     dev: false
 
   /@fluentui/react-portal-compat-context@9.0.2(@types/react@17.0.47)(react@17.0.2):
@@ -877,6 +928,12 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@fluentui/set-version@8.2.11:
+    resolution: {integrity: sha512-UI03tysau/adBO1a3q4uFZWQ3lfkiFcAWIFng4k5odWcCokfCm5IxA0urKqj5W5JRYdyoBUaq8QbcNGkFB4dCw==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
+
   /@fluentui/set-version@8.2.2:
     resolution: {integrity: sha512-Vg20KZ0ufgWjxx6GFbqC5wiVxXZDUWgNT0r0By/Eyj4bUSb1jG6lmf5z1oY1dUX0YS6Cp5e6GnvbNdXg5E7orA==}
     dependencies:
@@ -890,6 +947,20 @@ packages:
       '@fluentui/set-version': 8.2.2
       '@fluentui/theme': 2.6.16(@types/react@17.0.47)(react@17.0.2)
       '@fluentui/utilities': 8.13.1(@types/react@17.0.47)(react@17.0.2)
+      '@microsoft/load-themed-styles': 1.10.295
+      tslib: 2.4.0
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+    dev: false
+
+  /@fluentui/style-utilities@8.9.18(@types/react@17.0.47)(react@17.0.2):
+    resolution: {integrity: sha512-bWRcN8q2JDLZJOxJ3ov+2MLP+XqK3tHMGyLWjDAkUYUzgsM3ppA0HAroo/MLkn8vrFcoUYCuL/jtv7IXR6SZBw==}
+    dependencies:
+      '@fluentui/merge-styles': 8.5.12
+      '@fluentui/set-version': 8.2.11
+      '@fluentui/theme': 2.6.36(@types/react@17.0.47)(react@17.0.2)
+      '@fluentui/utilities': 8.13.19(@types/react@17.0.47)(react@17.0.2)
       '@microsoft/load-themed-styles': 1.10.295
       tslib: 2.4.0
     transitivePeerDependencies:
@@ -911,6 +982,20 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@fluentui/theme@2.6.36(@types/react@17.0.47)(react@17.0.2):
+    resolution: {integrity: sha512-rSP+LNmOJ9woiZzicdgtKFHt8Tyq7Jqu4KpczW0zXOYR9orgwFecpiUwRpZs1zD6lb3pAUNw4oYrM1tc7FH5AA==}
+    peerDependencies:
+      '@types/react': '>=16.8.0 <19.0.0'
+      react: '>=16.8.0 <19.0.0'
+    dependencies:
+      '@fluentui/merge-styles': 8.5.12
+      '@fluentui/set-version': 8.2.11
+      '@fluentui/utilities': 8.13.19(@types/react@17.0.47)(react@17.0.2)
+      '@types/react': 17.0.47
+      react: 17.0.2
+      tslib: 2.4.0
+    dev: false
+
   /@fluentui/utilities@8.13.1(@types/react@17.0.47)(react@17.0.2):
     resolution: {integrity: sha512-BpLa0lSYnZ3YoTGB6T/pQ0vUVq0PEr6gF+daptyeiLUkEXVoy3HYgX6ZanA62wJ89ycIwI8A+1aUEbmtDMupYg==}
     peerDependencies:
@@ -920,6 +1005,20 @@ packages:
       '@fluentui/dom-utilities': 2.2.2
       '@fluentui/merge-styles': 8.5.3
       '@fluentui/set-version': 8.2.2
+      '@types/react': 17.0.47
+      react: 17.0.2
+      tslib: 2.4.0
+    dev: false
+
+  /@fluentui/utilities@8.13.19(@types/react@17.0.47)(react@17.0.2):
+    resolution: {integrity: sha512-v0WNV6NNQKi9nLttvc6btzxX3XOVRA817fZ7zBqsV6JWQGRfyrBwhskh6TUIgANJjPejz5nk05U6rvSWNUM+FQ==}
+    peerDependencies:
+      '@types/react': '>=16.8.0 <19.0.0'
+      react: '>=16.8.0 <19.0.0'
+    dependencies:
+      '@fluentui/dom-utilities': 2.2.11
+      '@fluentui/merge-styles': 8.5.12
+      '@fluentui/set-version': 8.2.11
       '@types/react': 17.0.47
       react: 17.0.2
       tslib: 2.4.0
