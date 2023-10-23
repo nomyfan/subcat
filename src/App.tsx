@@ -18,6 +18,7 @@ import {
   Spinner,
   TextField,
   Dropdown,
+  Slider,
 } from "@fluentui/react";
 import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
@@ -32,6 +33,11 @@ function valueInRange(value: number, min = 0, max = 100) {
 const formatOptions = [
   { key: "JPG", text: "JPG" },
   { key: "PNG", text: "PNG" },
+];
+
+const compressTypeOptions = [
+  { key: "Best", text: "Best" },
+  { key: "Fast", text: "Fast" },
 ];
 
 function App() {
@@ -60,8 +66,18 @@ function App() {
     filename: string;
     saveto: string;
     format: "JPG" | "PNG";
+    // For JPG format only
+    quality: number;
+    // For PNG format only
+    compressType: "Best" | "Fast";
   }>({
-    defaultValues: { filename: "", saveto: "", format: "JPG" },
+    defaultValues: {
+      filename: "",
+      saveto: "",
+      format: "JPG",
+      quality: 90,
+      compressType: "Fast",
+    },
   });
   const formValues = form.watch();
 
@@ -106,7 +122,8 @@ function App() {
   };
 
   const handleGenerate = () => {
-    const { saveto, filename, format } = formValues;
+    const { saveto, filename, format, quality, compressType } =
+      form.getValues();
     const items = getStoreState().items;
     if (items.length) {
       setGenerating(true);
@@ -125,7 +142,10 @@ function App() {
         }),
         dir: saveto,
         filename,
-        format,
+        format: {
+          PNG: format === "PNG" ? compressType : undefined,
+          JPG: format === "JPG" ? quality : undefined,
+        },
       }).catch(() => {
         setGenerating(false);
       });
@@ -223,7 +243,7 @@ function App() {
             return (
               <TextField
                 disabled={generating}
-                label="File name"
+                label="File Name"
                 required
                 {...field}
               />
@@ -245,6 +265,49 @@ function App() {
                 onChange={(_, opt) => {
                   if (opt) {
                     form.setValue("format", opt.key as "JPG" | "PNG");
+                  }
+                }}
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name="quality"
+          control={form.control}
+          render={({ field }) => {
+            if (formValues.format !== "JPG") {
+              return <></>;
+            }
+            return (
+              <Slider
+                min={1}
+                max={100}
+                label="Quality"
+                disabled={generating}
+                {...field}
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name="compressType"
+          control={form.control}
+          render={({ field }) => {
+            if (formValues.format !== "PNG") {
+              return <></>;
+            }
+            return (
+              <Dropdown
+                disabled={generating}
+                label="Compress Type"
+                required
+                options={compressTypeOptions}
+                selectedKey={field.value}
+                onChange={(_, opt) => {
+                  if (opt) {
+                    field.onChange(opt.key);
                   }
                 }}
               />

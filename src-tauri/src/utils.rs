@@ -1,7 +1,7 @@
 use std::path;
 
 use anyhow::Result;
-use image::{GenericImage, ImageBuffer, RgbaImage};
+use image::{codecs::png::CompressionType, GenericImage, ImageBuffer};
 use serde::{Deserialize, Serialize};
 use tokio::{fs, sync::mpsc::unbounded_channel, task};
 
@@ -17,9 +17,18 @@ pub(crate) struct Image {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub enum PngCompressType {
+    Fast,
+    Best,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub enum Format {
-    PNG,
-    JPG,
+    #[serde(alias = "PNG")]
+    Png(PngCompressType),
+    // from one to 100
+    #[serde(alias = "JPG")]
+    Jpg(u8),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -93,7 +102,7 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     }
     images.sort_by(|a, b| a.order.cmp(&b.order));
 
-    let mut final_img: RgbaImage = ImageBuffer::new(final_width, final_height);
+    let mut final_img = ImageBuffer::new(final_width, final_height);
     let mut y_offset = 0u32;
 
     println!("Generating...");
@@ -107,18 +116,30 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     let save_to = path::Path::new(&dir[..]).join(
         filename
             + match format {
-                Format::JPG => ".jpg",
-                Format::PNG => ".png",
+                Format::Jpg(_) => ".jpg",
+                Format::Png(_) => ".png",
             },
     );
 
-    final_img.save_with_format(
-        save_to,
-        match format {
-            Format::PNG => image::ImageFormat::Png,
-            Format::JPG => image::ImageFormat::Jpeg,
-        },
-    )?;
+    let writer = std::fs::File::create(save_to)?;
+
+    match format {
+        Format::Png(compress_type) => {
+            let encoder = image::codecs::png::PngEncoder::new_with_quality(
+                writer,
+                match compress_type {
+                    PngCompressType::Fast => CompressionType::Fast,
+                    PngCompressType::Best => CompressionType::Best,
+                },
+                image::codecs::png::FilterType::Sub,
+            );
+            final_img.write_with_encoder(encoder)?;
+        }
+        Format::Jpg(quality) => {
+            let encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(writer, quality);
+            final_img.write_with_encoder(encoder)?;
+        }
+    };
 
     Ok(())
 }
