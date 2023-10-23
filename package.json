@@ -20,6 +20,7 @@
     "@tauri-apps/api": "^1.2.0",
     "classnames": "^2.3.2",
     "immer": "^9.0.21",
+    "nanoid": "^5.0.2",
     "react": "^17",
     "react-dom": "^17",
     "react-hook-form": "^7.35.0",

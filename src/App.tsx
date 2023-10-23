@@ -22,6 +22,7 @@ import { useForm, Controller } from "react-hook-form";
 import { ThumbnailList } from "./ThumbnaiList";
 import { Trash } from "./Trash";
 import { DragDropContext, type DragDropContextProps } from "@hello-pangea/dnd";
+import { nanoid } from "nanoid/non-secure";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -145,6 +146,8 @@ function App() {
         text: "Save as",
         onClick: () => {
           form.reset();
+          const defaultFilename = nanoid(7);
+          form.setValue("filename", defaultFilename);
           toggleVisible(true);
         },
         disabled: emptySelection,
