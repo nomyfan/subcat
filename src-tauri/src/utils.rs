@@ -1,88 +1,54 @@
-use std::path;
-
+use crate::model::{Format, GenerateEventArgs, ImageInfo, PngCompressType};
 use anyhow::Result;
-use image::{codecs::png::CompressionType, GenericImage, ImageBuffer};
-use serde::{Deserialize, Serialize};
-use tokio::{fs, sync::mpsc::unbounded_channel, task};
+use image::{
+    codecs::{
+        jpeg::JpegEncoder,
+        png::{CompressionType, FilterType, PngEncoder},
+    },
+    GenericImage, ImageBuffer,
+};
+use tokio::{fs, sync::mpsc::channel, task};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct Image {
-    pub(crate) path: String,
-    #[serde(alias = "offsetY")]
-    pub(crate) offset_y: u32,
-    #[serde(alias = "offsetX")]
-    pub(crate) offset_x: Option<u32>,
-    pub(crate) width: u32,
-    pub(crate) height: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum PngCompressType {
-    Fast,
-    Best,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum Format {
-    #[serde(alias = "PNG")]
-    Png(PngCompressType),
-    // from one to 100
-    #[serde(alias = "JPG")]
-    Jpg(u8),
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct Config {
-    pub(crate) imgs: Vec<Image>,
-    pub(crate) dir: String,
-    pub(crate) filename: String,
-    pub(crate) format: Format,
-}
-
-struct ImageMessage {
+struct OrderMessage {
     order: usize,
     img: ImageBuffer<image::Rgba<u8>, Vec<u8>>,
 }
 
-pub(crate) async fn generate(config: Config) -> Result<()> {
-    let Config {
+pub(crate) async fn generate(args: GenerateEventArgs) -> Result<()> {
+    let GenerateEventArgs {
         imgs,
         dir,
         filename,
         format,
-    } = config;
+    } = args;
     let imgs_count = imgs.len();
 
-    let (tx, mut rx) = unbounded_channel();
+    let (tx, mut rx) = channel::<Result<OrderMessage>>(imgs_count);
 
     println!("Loading images...");
-    for (i, img_config) in imgs.iter().enumerate() {
-        let order = i;
-        let path = img_config.path.to_string();
-        let y = img_config.offset_y;
-        let width = img_config.width;
-        let height = img_config.height;
+    for (order, img_info) in imgs.into_iter().enumerate() {
         let tx = tx.clone();
 
         task::spawn(async move {
-            match fs::read(path).await {
-                Ok(file) => match image::load_from_memory(&file) {
-                    Ok(mut img) => {
-                        let sub_image = img.sub_image(0, y, width, height);
-                        let msg = ImageMessage {
-                            order,
-                            img: sub_image.to_image(),
-                        };
-                        let _ = tx.send(Ok(msg));
-                    }
-                    Err(e) => {
-                        let _ = tx.send(Err(anyhow::anyhow!(e)));
-                    }
-                },
-                Err(e) => {
-                    let _ = tx.send(Err(anyhow::anyhow!(e)));
-                }
-            }
+            let ImageInfo {
+                path,
+                offset_y: y,
+                width,
+                height,
+                ..
+            } = img_info;
+            let result = fs::read(path)
+                .await
+                .map_err(|e| anyhow::anyhow!(e))
+                .and_then(|file| {
+                    image::load_from_memory(&file)
+                        .map_err(|e| anyhow::anyhow!(e))
+                        .map(|mut img| {
+                            let img = img.sub_image(0, y, width, height).to_image();
+                            OrderMessage { order, img }
+                        })
+                });
+            let _ = tx.send(result).await;
         });
     }
 
@@ -102,10 +68,9 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     }
     images.sort_by(|a, b| a.order.cmp(&b.order));
 
+    println!("Generating...");
     let mut final_img = ImageBuffer::new(final_width, final_height);
     let mut y_offset = 0u32;
-
-    println!("Generating...");
     for msg in &images {
         let img = &msg.img;
         final_img.copy_from(img, 0, y_offset)?;
@@ -113,7 +78,7 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
     }
 
     println!("Saving...");
-    let save_to = path::Path::new(&dir[..]).join(
+    let save_to = std::path::Path::new(&dir).join(
         filename
             + match format {
                 Format::Jpg(_) => ".jpg",
@@ -125,18 +90,18 @@ pub(crate) async fn generate(config: Config) -> Result<()> {
 
     match format {
         Format::Png(compress_type) => {
-            let encoder = image::codecs::png::PngEncoder::new_with_quality(
+            let encoder = PngEncoder::new_with_quality(
                 writer,
                 match compress_type {
                     PngCompressType::Fast => CompressionType::Fast,
                     PngCompressType::Best => CompressionType::Best,
                 },
-                image::codecs::png::FilterType::Sub,
+                FilterType::Adaptive,
             );
             final_img.write_with_encoder(encoder)?;
         }
         Format::Jpg(quality) => {
-            let encoder = image::codecs::jpeg::JpegEncoder::new_with_quality(writer, quality);
+            let encoder = JpegEncoder::new_with_quality(writer, quality);
             final_img.write_with_encoder(encoder)?;
         }
     };

@@ -3,10 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+mod model;
 mod utils;
 
+use crate::model::GenerateEventArgs;
+use crate::utils::generate;
 use tauri::{async_runtime, Manager};
-use utils::{generate, Config};
 
 fn main() {
     tauri::Builder::default()
@@ -15,11 +17,12 @@ fn main() {
             let main_window_clone = main_window.clone();
             main_window.listen("fe-subcat-generate", move |event| {
                 println!("got fe-subcat-generate with payload {:?}", event.payload());
-                let config: Config = serde_json::from_str(event.payload().unwrap()).unwrap();
+                let args: GenerateEventArgs =
+                    serde_json::from_str(event.payload().unwrap()).unwrap();
 
                 let main_window = main_window_clone.clone();
                 async_runtime::spawn(async move {
-                    match generate(config).await {
+                    match generate(args).await {
                         Ok(()) => {
                             main_window.emit("be-subcat-generate", "ok").unwrap();
                             println!("Ok");
