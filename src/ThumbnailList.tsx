@@ -75,6 +75,7 @@ function ThumbnailList() {
                           </ContextMenuItem>
 
                           <ContextMenuItem
+                            className="text-red-500 focus:text-red-500"
                             onSelect={() => {
                               storeActions.deleteItem(index);
                             }}>
