@@ -63,10 +63,10 @@ dependencies:
     specifier: ^5.0.2
     version: 5.0.2
   react:
-    specifier: ^17
+    specifier: ^17.0.2
     version: 17.0.2
   react-dom:
-    specifier: ^17
+    specifier: ^17.0.2
     version: 17.0.2(react@17.0.2)
   react-hook-form:
     specifier: ^7.35.0
@@ -98,16 +98,16 @@ devDependencies:
     specifier: ^1.5.5
     version: 1.5.5
   '@types/react':
-    specifier: ^17
+    specifier: ^17.0.69
     version: 17.0.69
   '@types/react-dom':
-    specifier: ^17
+    specifier: ^17.0.22
     version: 17.0.22
   '@typescript-eslint/eslint-plugin':
-    specifier: ^4.32.0
+    specifier: ^4.33.0
     version: 4.33.0(@typescript-eslint/parser@4.33.0)(eslint@7.32.0)(typescript@5.0.4)
   '@typescript-eslint/parser':
-    specifier: ^4.32.0
+    specifier: ^4.33.0
     version: 4.33.0(eslint@7.32.0)(typescript@5.0.4)
   '@vitejs/plugin-react':
     specifier: ^3.1.0
@@ -119,13 +119,13 @@ devDependencies:
     specifier: ^7.32.0
     version: 7.32.0
   eslint-config-prettier:
-    specifier: ^8.3.0
+    specifier: ^8.5.0
     version: 8.5.0(eslint@7.32.0)
   eslint-plugin-react:
-    specifier: ^7.26.1
+    specifier: ^7.30.1
     version: 7.30.1(eslint@7.32.0)
   eslint-plugin-react-hooks:
-    specifier: ^4.2.0
+    specifier: ^4.6.0
     version: 4.6.0(eslint@7.32.0)
   husky:
     specifier: ^8.0.1
@@ -2359,7 +2359,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001402
+      caniuse-lite: 1.0.30001554
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -2391,7 +2391,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001402
+      caniuse-lite: 1.0.30001554
       electron-to-chromium: 1.4.254
       node-releases: 2.0.6
       update-browserslist-db: 1.0.9(browserslist@4.21.4)
@@ -2402,7 +2402,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001478
+      caniuse-lite: 1.0.30001554
       electron-to-chromium: 1.4.365
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10(browserslist@4.21.5)
@@ -2438,12 +2438,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite@1.0.30001402:
-    resolution: {integrity: sha512-Mx4MlhXO5NwuvXGgVb+hg65HZ+bhUYsz8QtDGDo2QmaJS2GBX47Xfi2koL86lc8K+l+htXeTEB/Aeqvezoo6Ew==}
-    dev: true
-
-  /caniuse-lite@1.0.30001478:
-    resolution: {integrity: sha512-gMhDyXGItTHipJj2ApIvR+iVB5hd0KP3svMWWXDvZOmjzJJassGLMfxRkQCSYgGd2gtdL/ReeiyvMSFD1Ss6Mw==}
+  /caniuse-lite@1.0.30001554:
+    resolution: {integrity: sha512-A2E3U//MBwbJVzebddm1YfNp7Nud5Ip+IPn4BozBmn4KqVX7AvluoIDFWjsv5OkGnKUXQVmMSoMKLa3ScCblcQ==}
     dev: true
 
   /chalk@2.4.2:
