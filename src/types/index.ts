@@ -10,7 +10,7 @@ export interface Item {
 
 export interface StoreState {
   items: Item[];
-  dragging: boolean;
+  draggingId?: string;
   selected?: number;
 }
 

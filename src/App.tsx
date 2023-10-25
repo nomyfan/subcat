@@ -1,52 +1,61 @@
 import { Layout } from "./Layout";
 import { Content } from "./Content";
 import { Preview } from "./Preview";
-import { AppStoreProvider } from "./AppStoreProvider";
-import { useAppStore } from "./hooks";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
 import { emit, listen } from "@tauri-apps/api/event";
 import { useBoolean, useAsync } from "react-use";
-import {
-  CommandButton,
-  DefaultButton,
-  Dialog,
-  DialogFooter,
-  DialogType,
-  type IContextualMenuProps,
-  PrimaryButton,
-  Spinner,
-  TextField,
-  Dropdown,
-  Slider,
-} from "@fluentui/react";
-import { useForm, Controller } from "react-hook-form";
-import { ThumbnailList } from "./ThumbnaiList";
-import { Trash } from "./Trash";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { useForm } from "react-hook-form";
+import { ThumbnailList } from "./ThumbnailList";
 import { DragDropContext, type DragDropContextProps } from "@hello-pangea/dnd";
 import { nanoid } from "nanoid/non-secure";
+import {
+  Dialog,
+  DialogTitle,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+} from "subcat/components/ui/dialog";
+import { Button } from "subcat/components/ui/button";
+import { Input } from "subcat/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "subcat/components/ui/form";
+import * as storeActions from "./storeActions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "subcat/components/ui/select";
+import { Slider } from "subcat/components/ui/slider";
+import { useEffect } from "react";
+import { store } from "./store";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
 }
 
-const formatOptions = [
-  { key: "JPG", text: "JPG" },
-  { key: "PNG", text: "PNG" },
-];
-
-const compressTypeOptions = [
-  { key: "Best", text: "Best" },
-  { key: "Fast", text: "Fast" },
-];
-
 function App() {
-  const {
-    state: emptySelection,
-    getStoreState,
-    setStoreState,
-    actions,
-  } = useAppStore((st) => !st.items.length);
+  useEffect(() => {
+    let isEmpty: boolean = store.getState().items.length === 0;
+    emit("fe-menu-disable", { id: "save_as", disabled: isEmpty });
+    store.subscribe((state, prevState) => {
+      if (state.items !== prevState.items) {
+        const isEmptyNow = state.items.length === 0;
+        if (isEmptyNow !== isEmpty) {
+          isEmpty = isEmptyNow;
+          emit("fe-menu-disable", { id: "save_as", disabled: isEmpty });
+        }
+      }
+    });
+  }, []);
 
   const [visible, toggleVisible] = useBoolean(false);
   const [generating, setGenerating] = useBoolean(false);
@@ -81,50 +90,33 @@ function App() {
   });
   const formValues = form.watch();
 
-  const handleSelectImages = async () => {
-    const files = await open({
-      multiple: true,
-      directory: false,
-      recursive: false,
-      title: "Open",
-      filters: [{ name: "images", extensions: ["jpg", "jpeg", "png"] }],
-    });
-    if (files) {
-      const fileUrls = Array.isArray(files) ? files : [files];
-      const items = getStoreState().items;
-
-      const newItems = fileUrls
-        .filter((url) => {
-          return !items.find((it) => it.url === url);
-        })
-        .map((url, i) => {
-          const src = convertFileSrc(url);
-          return {
-            id: url,
-            url,
-            src,
-            height: 0,
-            width: 0,
-            middle: i === 0 && items.length === 0 ? 100 : 10,
-            bottom: 0,
-          };
-        });
-
-      if (newItems.length) {
-        setStoreState((st) => {
-          return {
-            selected: st.selected ?? 0,
-            items: st.items.concat(newItems),
-          };
-        });
+  useAsync(async () => {
+    const handler: Parameters<typeof listen>[1] = ({ payload }) => {
+      switch (payload) {
+        case "open": {
+          storeActions.selectImages();
+          break;
+        }
+        case "save_as": {
+          form.reset();
+          const defaultFilename = nanoid(7);
+          form.setValue("filename", defaultFilename);
+          const defaultFormat = "JPG";
+          form.setValue("format", defaultFormat);
+          toggleVisible(true);
+          break;
+        }
       }
-    }
-  };
+    };
+    const unsub = await listen("be-menu-select", handler);
+
+    return () => unsub();
+  }, [form]);
 
   const handleGenerate = () => {
     const { saveto, filename, format, quality, compressType } =
       form.getValues();
-    const items = getStoreState().items;
+    const items = store.getState().items;
     if (items.length) {
       setGenerating(true);
       emit("fe-subcat-generate", {
@@ -165,33 +157,8 @@ function App() {
     }
   };
 
-  const menuProps: IContextualMenuProps = {
-    items: [
-      {
-        key: "select_images",
-        text: "Open",
-        onClick: () => {
-          handleSelectImages();
-        },
-      },
-      {
-        key: "save_as",
-        text: "Save as",
-        onClick: () => {
-          form.reset();
-          const defaultFilename = nanoid(7);
-          form.setValue("filename", defaultFilename);
-          const defaultFormat = "JPG";
-          form.setValue("format", defaultFormat);
-          toggleVisible(true);
-        },
-        disabled: emptySelection,
-      },
-    ],
-  };
-
-  const handleDragStart: DragDropContextProps["onBeforeCapture"] = () => {
-    actions.toggleDragging(true);
+  const handleDragStart: DragDropContextProps["onDragStart"] = (evt) => {
+    storeActions.toggleDragging(evt.draggableId);
   };
 
   const handleDragEnd: DragDropContextProps["onDragEnd"] = (evt) => {
@@ -204,156 +171,168 @@ function App() {
       destination: { index: toIndex },
     } = evt;
 
-    if (evt.destination.droppableId === "trash") {
-      actions.deleteItem(fromIndex);
-    } else {
-      actions.moveItem(fromIndex, toIndex);
-    }
-
-    actions.toggleDragging(false);
+    storeActions.moveItem(fromIndex, toIndex);
+    storeActions.toggleDragging();
   };
 
   return (
-    <DragDropContext
-      onBeforeCapture={handleDragStart}
-      onDragEnd={handleDragEnd}>
+    <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <Layout
-        head={
-          <div className="bg-gray-100">
-            <CommandButton menuProps={menuProps}>FILES</CommandButton>
-          </div>
-        }
+        head={null}
         left={<ThumbnailList />}
         middle={<Content />}
         right={<Preview />}
       />
 
-      <Dialog
-        hidden={!visible}
-        onDismiss={toggleVisible}
-        dialogContentProps={{
-          type: DialogType.largeHeader,
-          title: "Save as",
-        }}
-        modalProps={{ isBlocking: true }}>
-        <Controller
-          name="filename"
-          control={form.control}
-          render={({ field }) => {
-            return (
-              <TextField
-                disabled={generating}
-                label="File Name"
-                required
-                {...field}
-              />
-            );
-          }}
-        />
+      <Dialog open={visible}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save as</DialogTitle>
+          </DialogHeader>
 
-        <Controller
-          name="format"
-          control={form.control}
-          render={({ field }) => {
-            return (
-              <Dropdown
-                disabled={generating}
-                label="Format"
-                required
-                options={formatOptions}
-                selectedKey={field.value}
-                onChange={(_, opt) => {
-                  if (opt) {
-                    form.setValue("format", opt.key as "JPG" | "PNG");
-                  }
-                }}
-              />
-            );
-          }}
-        />
+          <Form {...form}>
+            <FormField
+              name="filename"
+              rules={{ required: true }}
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>File Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={generating}
+                      />
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
 
-        <Controller
-          name="quality"
-          control={form.control}
-          render={({ field }) => {
-            if (formValues.format !== "JPG") {
-              return <></>;
-            }
-            return (
-              <Slider
-                min={1}
-                max={100}
-                label="Quality"
-                disabled={generating}
-                {...field}
-              />
-            );
-          }}
-        />
+            <FormField
+              name="format"
+              rules={{ required: true }}
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>Format</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={generating}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select output format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="JPG">JPG</SelectItem>
+                          <SelectItem value="PNG">PNG</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
 
-        <Controller
-          name="compressType"
-          control={form.control}
-          render={({ field }) => {
-            if (formValues.format !== "PNG") {
-              return <></>;
-            }
-            return (
-              <Dropdown
-                disabled={generating}
-                label="Compress Type"
-                required
-                options={compressTypeOptions}
-                selectedKey={field.value}
-                onChange={(_, opt) => {
-                  if (opt) {
-                    field.onChange(opt.key);
-                  }
-                }}
-              />
-            );
-          }}
-        />
+            <FormField
+              name="compressType"
+              render={({ field }) => {
+                if (formValues.format !== "PNG") {
+                  return <></>;
+                }
+                return (
+                  <FormItem>
+                    <FormLabel>Compress Type</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={generating}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select output format" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Fast">Fast</SelectItem>
+                        <SelectItem value="Best">Best</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                );
+              }}
+            />
 
-        <DefaultButton
-          disabled={generating}
-          className="mt-3 mb-1"
-          onClick={() => handleSaveTo()}>
-          Select directory
-        </DefaultButton>
-        <Controller
-          control={form.control}
-          render={({ field }) => {
-            return <TextField required disabled {...field} />;
-          }}
-          name="saveto"
-        />
+            <FormField
+              name="quality"
+              render={({ field }) => {
+                if (formValues.format !== "JPG") {
+                  return <></>;
+                }
 
-        <DialogFooter>
-          <PrimaryButton
-            className="align-top"
-            disabled={!formValues.filename || !formValues.saveto || generating}
-            onClick={() => handleGenerate()}>
-            {generating && <Spinner className="mr-1.5" />}
-            <span>Save</span>
-          </PrimaryButton>
-          <DefaultButton
-            disabled={generating}
-            onClick={() => toggleVisible(false)}
-            text="Cancel"
-          />
-        </DialogFooter>
+                return (
+                  <FormItem>
+                    <FormLabel>Quality</FormLabel>
+                    <FormControl>
+                      <Slider
+                        min={1}
+                        max={100}
+                        step={1}
+                        value={[field.value]}
+                        onValueChange={(value: [number]) => {
+                          field.onChange(value[0]);
+                        }}
+                        disabled={generating}
+                      />
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
+
+            <FormField
+              name="saveto"
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <div className="flex">
+                      <Input
+                        disabled
+                        required
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                      <Button
+                        className="ml-2"
+                        onClick={handleSaveTo}
+                        disabled={generating}>
+                        Select directory
+                      </Button>
+                    </div>
+                  </FormItem>
+                );
+              }}
+            />
+          </Form>
+
+          <DialogFooter>
+            <Button
+              disabled={
+                !formValues.filename || !formValues.saveto || generating
+              }
+              onClick={handleGenerate}>
+              {generating ? <ReloadIcon className="mr-2 animate-spin" /> : null}
+              Save
+            </Button>
+            <DialogClose
+              disabled={generating}
+              onClick={() => toggleVisible(false)}>
+              Cancel
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-
-      <Trash />
     </DragDropContext>
   );
 }
 
-export default function AppWithStore() {
-  return (
-    <AppStoreProvider>
-      <App />
-    </AppStoreProvider>
-  );
-}
+export default App;
