@@ -157,6 +157,10 @@ function App() {
     }
   };
 
+  const handleDragStart: DragDropContextProps["onDragStart"] = (evt) => {
+    storeActions.toggleDragging(evt.draggableId);
+  };
+
   const handleDragEnd: DragDropContextProps["onDragEnd"] = (evt) => {
     if (!evt.destination) {
       return;
@@ -168,10 +172,11 @@ function App() {
     } = evt;
 
     storeActions.moveItem(fromIndex, toIndex);
+    storeActions.toggleDragging();
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <Layout
         head={null}
         left={<ThumbnailList />}

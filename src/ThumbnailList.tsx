@@ -12,10 +12,15 @@ import {
 import { TrashIcon } from "@radix-ui/react-icons";
 
 function ThumbnailList() {
-  const { items, selected } = useAppStoreState(
-    (st) => ({ items: st.items, selected: st.selected }),
+  const { items, selected, draggingId } = useAppStoreState(
+    (st) => ({
+      items: st.items,
+      selected: st.selected,
+      draggingId: st.draggingId,
+    }),
     shallow,
   );
+  const isDragging = !!draggingId;
 
   return (
     <Droppable droppableId="thumbnailList">
@@ -32,11 +37,13 @@ function ThumbnailList() {
                           <div
                             ref={provided.innerRef}
                             className={cn(
-                              "border-0 border-t-2 border-solid block hover:bg-neutral-900",
+                              "border-y border-solid block bg-white hover:bg-neutral-200",
                               {
                                 "border-t-transparent": snapshot.isDragging,
-                                "bg-neutral-900": selected === index,
+                                "bg-neutral-100": selected === index,
                               },
+                              isDragging && "bg-white",
+                              draggingId === it.id && "bg-neutral-200",
                             )}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}>
