@@ -59,4 +59,6 @@ code {
     transform: translate(-50%, -50%);
 }
 
+@tailwind base;
+@tailwind components;
 @tailwind utilities;

@@ -1,5 +1,5 @@
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import classNames from "classnames";
+import { cn } from "subcat/lib/utils";
 import { useAppStore } from "./hooks";
 import { shallow } from "./store";
 
@@ -24,7 +24,7 @@ function ThumbnailList() {
                     return (
                       <div
                         ref={provided.innerRef}
-                        className={classNames(
+                        className={cn(
                           "border-0 border-t-2 border-solid block hover:bg-neutral-900",
                           {
                             "border-t-transparent": snapshot.isDragging,
