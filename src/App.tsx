@@ -6,8 +6,7 @@ import { emit, listen } from "@tauri-apps/api/event";
 import { useBoolean, useAsync } from "react-use";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useForm } from "react-hook-form";
-import { ThumbnailList } from "./ThumbnaiList";
-import { Trash } from "./Trash";
+import { ThumbnailList } from "./ThumbnailList";
 import { DragDropContext, type DragDropContextProps } from "@hello-pangea/dnd";
 import { nanoid } from "nanoid/non-secure";
 import {
@@ -158,10 +157,6 @@ function App() {
     }
   };
 
-  const handleDragStart: DragDropContextProps["onBeforeCapture"] = () => {
-    storeActions.toggleDragging(true);
-  };
-
   const handleDragEnd: DragDropContextProps["onDragEnd"] = (evt) => {
     if (!evt.destination) {
       return;
@@ -172,19 +167,11 @@ function App() {
       destination: { index: toIndex },
     } = evt;
 
-    if (evt.destination.droppableId === "trash") {
-      storeActions.deleteItem(fromIndex);
-    } else {
-      storeActions.moveItem(fromIndex, toIndex);
-    }
-
-    storeActions.toggleDragging(false);
+    storeActions.moveItem(fromIndex, toIndex);
   };
 
   return (
-    <DragDropContext
-      onBeforeCapture={handleDragStart}
-      onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={handleDragEnd}>
       <Layout
         head={null}
         left={<ThumbnailList />}
@@ -339,8 +326,6 @@ function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <Trash />
     </DragDropContext>
   );
 }

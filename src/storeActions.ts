@@ -84,11 +84,3 @@ export function deleteItem(index: Index) {
     state.items.splice(index, 1);
   });
 }
-
-export function toggleDragging(dragging?: boolean) {
-  if (dragging === undefined) {
-    store.setState((state) => ({ dragging: !state.dragging }));
-  } else {
-    store.setState({ dragging });
-  }
-}

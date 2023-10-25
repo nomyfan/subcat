@@ -6,7 +6,7 @@ import type { StoreState } from "./types";
 function createStore() {
   return createStore_(
     immer<StoreState>(() => {
-      return { items: [], dragging: false };
+      return { items: [] };
     }),
   );
 }
