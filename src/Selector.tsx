@@ -1,5 +1,6 @@
 import { PropsWithChildren, useRef } from "react";
 import { Item } from "./types";
+import { HeightIcon } from "@radix-ui/react-icons";
 
 const MIN_MIDDLE = 10;
 
@@ -78,37 +79,43 @@ function Selector(
             height: `calc(100% - ${item.middle + item.bottom}%)`,
           }}
         />
-        <div
-          className="divider"
-          onMouseDown={(evt) => {
-            console.log("evt.pageY", evt.pageY);
-            ref.current = {
-              cursor: "top",
-              sy: evt.pageY,
-              middle: item.middle,
-              bottom: item.bottom,
-            };
-            console.log("down");
-          }}
-        />
+        <div className="flex justify-center">
+          <HeightIcon
+            className="cursor-pointer text-white translate-y-[-50%] scale-150"
+            onMouseDown={(evt) => {
+              console.log("evt.pageY", evt.pageY);
+              ref.current = {
+                cursor: "top",
+                sy: evt.pageY,
+                middle: item.middle,
+                bottom: item.bottom,
+              };
+              console.log("down");
+            }}
+          />
+        </div>
+
         <div
           style={{
             flexGrow: 1,
           }}
         />
-        <div
-          className="divider"
-          onMouseDown={(evt) => {
-            console.log("evt.pageY", evt.pageY);
-            ref.current = {
-              cursor: "bottom",
-              sy: evt.pageY,
-              middle: item.middle,
-              bottom: item.bottom,
-            };
-            console.log("down");
-          }}
-        />
+        <div className="flex justify-center">
+          <HeightIcon
+            className="cursor-pointer text-white translate-y-[50%] scale-150"
+            onMouseDown={(evt) => {
+              console.log("evt.pageY", evt.pageY);
+              ref.current = {
+                cursor: "bottom",
+                sy: evt.pageY,
+                middle: item.middle,
+                bottom: item.bottom,
+              };
+              console.log("down");
+            }}
+          />
+        </div>
+
         <div
           style={{
             backgroundColor: "hsla(0, 100%, 0%, 0.6)",
