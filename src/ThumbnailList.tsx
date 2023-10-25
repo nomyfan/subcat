@@ -9,7 +9,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
 } from "subcat/components/ui/context-menu";
-import { TrashIcon } from "@radix-ui/react-icons";
+import { TrashIcon, CopyIcon } from "@radix-ui/react-icons";
 
 function ThumbnailList() {
   const { items, selected, draggingId } = useAppStoreState(
@@ -66,6 +66,14 @@ function ThumbnailList() {
                         </ContextMenuTrigger>
 
                         <ContextMenuContent>
+                          <ContextMenuItem
+                            onSelect={() => {
+                              storeActions.syncConfigToBelow(index);
+                            }}>
+                            <CopyIcon className="mr-2" />
+                            Sync to below
+                          </ContextMenuItem>
+
                           <ContextMenuItem
                             onSelect={() => {
                               storeActions.deleteItem(index);

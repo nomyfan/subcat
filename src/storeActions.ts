@@ -92,3 +92,17 @@ export function toggleDragging(id?: string) {
     store.setState({ draggingId: id });
   }
 }
+
+export function syncConfigToBelow(source: number) {
+  store.setState((st) => {
+    const sourceItem = st.items[source];
+    if (!sourceItem) {
+      return;
+    }
+
+    for (let i = source + 1; i < st.items.length; i++) {
+      st.items[i].middle = sourceItem.middle;
+      st.items[i].bottom = sourceItem.bottom;
+    }
+  });
+}
