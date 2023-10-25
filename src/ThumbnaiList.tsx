@@ -1,13 +1,11 @@
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { cn } from "subcat/lib/utils";
-import { useAppStore } from "./hooks";
 import { shallow } from "./store";
+import * as storeActions from "./storeActions";
+import { useAppStoreState } from "./hooks";
 
 function ThumbnailList() {
-  const {
-    state: { items, selected },
-    actions,
-  } = useAppStore(
+  const { items, selected } = useAppStoreState(
     (st) => ({ items: st.items, selected: st.selected }),
     shallow,
   );
@@ -38,7 +36,7 @@ function ThumbnailList() {
                           src={it.src}
                           className="w-full h-[200px] object-contain"
                           onLoad={(evt) => {
-                            actions.updateItem(index, (item) => {
+                            storeActions.updateItem(index, (item) => {
                               return {
                                 ...item,
                                 height: evt.currentTarget.naturalHeight,
@@ -46,7 +44,7 @@ function ThumbnailList() {
                               };
                             });
                           }}
-                          onClick={() => actions.selectItem(index)}
+                          onClick={() => storeActions.selectItem(index)}
                         />
                       </div>
                     );

@@ -34,3 +34,9 @@ pub(crate) struct GenerateEventArgs {
     pub(crate) filename: String,
     pub(crate) format: Format,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub(crate) struct MenuDisableEventArgs {
+    pub(crate) id: String,
+    pub(crate) disabled: bool,
+}

@@ -1,8 +1,9 @@
 import { Selector } from "./Selector";
-import { useAppStore } from "./hooks";
+import { useAppStoreState } from "./hooks";
+import * as storeActions from "./storeActions";
 
 function Content() {
-  const { state: selectedItem, actions } = useAppStore((st) =>
+  const selectedItem = useAppStoreState((st) =>
     st.selected === undefined ? undefined : st.items[st.selected],
   );
 
@@ -16,7 +17,7 @@ function Content() {
         key={selectedItem.id}
         item={selectedItem}
         setHeights={(factory) => {
-          actions.updateSelectedItem((item) => {
+          storeActions.updateSelectedItem((item) => {
             return { ...item, ...factory(item) };
           });
         }}>
