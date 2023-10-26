@@ -16,17 +16,18 @@ import * as storeActions from "./storeActions";
 
 function App() {
   useEffect(() => {
-    let isEmpty: boolean = store.getState().items.length === 0;
-    emit(SubcatEvent.FeMenuDisable, { id: "save_as", disabled: isEmpty });
-    store.subscribe((state, prevState) => {
-      if (state.items !== prevState.items) {
-        const isEmptyNow = state.items.length === 0;
-        if (isEmptyNow !== isEmpty) {
-          isEmpty = isEmptyNow;
-          emit(SubcatEvent.FeMenuDisable, { id: "save_as", disabled: isEmpty });
-        }
-      }
+    emit(SubcatEvent.FeMenuDisable, {
+      id: "save_as",
+      disabled: store.getState().items.length === 0,
     });
+    const unsub = store.subscribe(
+      (st) => st.items.length === 0,
+      (isEmpty) => {
+        emit(SubcatEvent.FeMenuDisable, { id: "save_as", disabled: isEmpty });
+      },
+    );
+
+    return () => unsub();
   }, []);
 
   const modalRef = useRef<ISaveAsModalRef>(null);

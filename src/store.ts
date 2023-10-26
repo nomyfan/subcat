@@ -1,4 +1,5 @@
 import { createStore as createStore_ } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import shallow from "zustand/shallow";
 
@@ -6,9 +7,11 @@ import type { StoreState } from "./types";
 
 function createStore() {
   return createStore_(
-    immer<StoreState>(() => {
-      return { items: [] };
-    }),
+    subscribeWithSelector(
+      immer<StoreState>(() => {
+        return { items: [] };
+      }),
+    ),
   );
 }
 
