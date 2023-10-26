@@ -9,6 +9,7 @@ mod utils;
 use crate::model::GenerateEventArgs;
 use crate::utils::generate;
 use model::MenuDisableEventArgs;
+use subcat_event::SubcatEvent;
 use tauri::{async_runtime, AboutMetadata, CustomMenuItem, Manager, Menu, MenuItem, Submenu};
 
 fn main() {
@@ -38,8 +39,7 @@ fn main() {
         .setup(|app| {
             let main_window = app.get_window("main").unwrap();
             let main_window_clone = main_window.clone();
-            main_window.listen("fe-subcat-generate", move |event| {
-                println!("got fe-subcat-generate with payload {:?}", event.payload());
+            main_window.listen(SubcatEvent::FeGenerate.as_ref(), move |event| {
                 let args: GenerateEventArgs =
                     serde_json::from_str(event.payload().unwrap()).unwrap();
 
@@ -47,11 +47,15 @@ fn main() {
                 async_runtime::spawn(async move {
                     match generate(args).await {
                         Ok(()) => {
-                            main_window.emit("be-subcat-generate", "ok").unwrap();
+                            main_window
+                                .emit(SubcatEvent::BeGenerateRes.as_ref(), "ok")
+                                .unwrap();
                             println!("Ok");
                         }
                         Err(err) => {
-                            main_window.emit("be-subcat-generate", "error").unwrap();
+                            main_window
+                                .emit(SubcatEvent::BeGenerateRes.as_ref(), "error")
+                                .unwrap();
                             println!("Error {:?}", err);
                         }
                     }
@@ -59,7 +63,7 @@ fn main() {
             });
 
             let main_window_clone = main_window.clone();
-            main_window.listen("fe-menu-disable", move |event| {
+            main_window.listen(SubcatEvent::FeMenuDisable.as_ref(), move |event| {
                 let menu_handle = main_window_clone.menu_handle();
                 let args: MenuDisableEventArgs =
                     serde_json::from_str(event.payload().unwrap()).unwrap();
@@ -75,7 +79,7 @@ fn main() {
         .on_menu_event(|event| {
             event
                 .window()
-                .emit("be-menu-select", event.menu_item_id())
+                .emit(SubcatEvent::BeMenuSelect.as_ref(), event.menu_item_id())
                 .unwrap();
         })
         .run(tauri::generate_context!())

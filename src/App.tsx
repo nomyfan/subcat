@@ -37,6 +37,7 @@ import {
 import { Slider } from "subcat/components/ui/slider";
 import { useEffect } from "react";
 import { store } from "./store";
+import { SubcatEvent } from "subcat_event";
 
 function valueInRange(value: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
@@ -45,13 +46,13 @@ function valueInRange(value: number, min = 0, max = 100) {
 function App() {
   useEffect(() => {
     let isEmpty: boolean = store.getState().items.length === 0;
-    emit("fe-menu-disable", { id: "save_as", disabled: isEmpty });
+    emit(SubcatEvent.FeMenuDisable, { id: "save_as", disabled: isEmpty });
     store.subscribe((state, prevState) => {
       if (state.items !== prevState.items) {
         const isEmptyNow = state.items.length === 0;
         if (isEmptyNow !== isEmpty) {
           isEmpty = isEmptyNow;
-          emit("fe-menu-disable", { id: "save_as", disabled: isEmpty });
+          emit(SubcatEvent.FeMenuDisable, { id: "save_as", disabled: isEmpty });
         }
       }
     });
@@ -66,7 +67,7 @@ function App() {
       toggleVisible(false);
     };
 
-    const unsub = await listen("be-subcat-generate", handler);
+    const unsub = await listen(SubcatEvent.BeGenerateRes, handler);
 
     return () => unsub();
   }, []);
@@ -108,7 +109,7 @@ function App() {
         }
       }
     };
-    const unsub = await listen("be-menu-select", handler);
+    const unsub = await listen(SubcatEvent.BeMenuSelect, handler);
 
     return () => unsub();
   }, [form]);
@@ -119,7 +120,7 @@ function App() {
     const items = store.getState().items;
     if (items.length) {
       setGenerating(true);
-      emit("fe-subcat-generate", {
+      emit(SubcatEvent.FeGenerate, {
         imgs: items.map((it) => {
           const { url, middle, bottom, width, height } = it;
 
