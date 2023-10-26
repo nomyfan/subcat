@@ -1,6 +1,7 @@
 import { open } from "@tauri-apps/api/dialog";
-import { store } from "./store";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
+
+import { store } from "./store";
 import type { Item, Index } from "./types";
 
 export async function selectImages() {

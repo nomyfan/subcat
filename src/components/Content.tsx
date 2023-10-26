@@ -1,6 +1,7 @@
+import { useAppStoreState } from "../hooks";
+import * as storeActions from "../storeActions";
+
 import { Selector } from "./Selector";
-import { useAppStoreState } from "./hooks";
-import * as storeActions from "./storeActions";
 
 function Content() {
   const selectedItem = useAppStoreState((st) =>

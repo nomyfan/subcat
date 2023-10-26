@@ -1,6 +1,7 @@
-import { useAppStoreState } from "./hooks";
-import type { Item } from "./types";
 import { useMeasure } from "react-use";
+
+import { useAppStoreState } from "../hooks";
+import type { Item } from "../types";
 
 function PreviewItem(props: { item: Item }) {
   const { item } = props;

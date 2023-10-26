@@ -1,6 +1,7 @@
 import { createStore as createStore_ } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import shallow from "zustand/shallow";
+
 import type { StoreState } from "./types";
 
 function createStore() {

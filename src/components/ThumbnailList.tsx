@@ -1,15 +1,16 @@
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import { cn } from "subcat/lib/utils";
-import { shallow } from "./store";
-import * as storeActions from "./storeActions";
-import { useAppStoreState } from "./hooks";
+import { TrashIcon, CopyIcon } from "@radix-ui/react-icons";
 import {
   ContextMenu,
   ContextMenuTrigger,
   ContextMenuContent,
   ContextMenuItem,
 } from "subcat/components/ui/context-menu";
-import { TrashIcon, CopyIcon } from "@radix-ui/react-icons";
+import { cn } from "subcat/lib/utils";
+
+import { useAppStoreState } from "../hooks";
+import { shallow } from "../store";
+import * as storeActions from "../storeActions";
 
 function ThumbnailList() {
   const { items, selected, draggingId } = useAppStoreState(

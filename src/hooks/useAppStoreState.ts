@@ -1,6 +1,7 @@
 import { useStore } from "zustand";
-import { StoreState } from "../types";
+
 import { store } from "../store";
+import { StoreState } from "../types";
 
 function useAppStoreState<U>(
   selector: (state: StoreState) => U,

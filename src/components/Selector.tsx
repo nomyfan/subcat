@@ -1,6 +1,7 @@
-import { PropsWithChildren, useRef } from "react";
-import { Item } from "./types";
 import { HeightIcon } from "@radix-ui/react-icons";
+import { PropsWithChildren, useRef } from "react";
+
+import { Item } from "../types";
 
 const MIN_MIDDLE = 10;
 

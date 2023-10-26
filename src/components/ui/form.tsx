@@ -1,6 +1,7 @@
-import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
+import { nanoid } from "nanoid/non-secure";
+import * as React from "react";
 import {
   Controller,
   ControllerProps,
@@ -9,10 +10,8 @@ import {
   FormProvider,
   useFormContext,
 } from "react-hook-form";
-
-import { cn } from "subcat/lib/utils";
 import { Label } from "subcat/components/ui/label";
-import { nanoid } from "nanoid/non-secure";
+import { cn } from "subcat/lib/utils";
 
 function useId() {
   const idRef = React.useRef<{ value: string }>();
