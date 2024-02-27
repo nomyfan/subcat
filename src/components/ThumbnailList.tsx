@@ -47,7 +47,8 @@ function ThumbnailList() {
                               draggingId === it.id && "bg-neutral-200",
                             )}
                             {...provided.draggableProps}
-                            {...provided.dragHandleProps}>
+                            {...provided.dragHandleProps}
+                          >
                             <img
                               alt=""
                               src={it.src}
@@ -70,7 +71,8 @@ function ThumbnailList() {
                           <ContextMenuItem
                             onSelect={() => {
                               storeActions.syncConfigToBelow(index);
-                            }}>
+                            }}
+                          >
                             <CopyIcon className="mr-2" />
                             Sync to below
                           </ContextMenuItem>
@@ -79,7 +81,8 @@ function ThumbnailList() {
                             className="text-red-500 focus:text-red-500"
                             onSelect={() => {
                               storeActions.deleteItem(index);
-                            }}>
+                            }}
+                          >
                             <TrashIcon className="mr-2" />
                             Delete
                           </ContextMenuItem>

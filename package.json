@@ -9,8 +9,9 @@
     "preview": "vite preview",
     "precommit": "pnpm lint",
     "tauri": "tauri",
-    "fmt": "pnpm fmt:rs",
+    "fmt": "pnpm fmt:rs && pnpm fmt:ts",
     "fmt:rs": "cd src-tauri && cargo fmt",
+    "fmt:ts": "pnpm exec prettier --write ./src",
     "lint": "pnpm lint:rs && pnpm lint:ts",
     "lint:rs": "cd src-tauri && cargo clippy -- -D warnings",
     "lint:ts": "pnpm exec eslint --fix ./src"

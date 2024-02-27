@@ -3,37 +3,37 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
 *::-webkit-scrollbar {
-   -webkit-appearance: none;
-   background: white;
-   width: 6px;
-   height: 6px;
- }
+  -webkit-appearance: none;
+  background: white;
+  width: 6px;
+  height: 6px;
+}
 
 *::-webkit-scrollbar-thumb {
-   background: rgba(0, 0, 0, .3);
-   width: 6px;
-   border-radius: 3px;
-   display: none;
- }
+  background: rgba(0, 0, 0, 0.3);
+  width: 6px;
+  border-radius: 3px;
+  display: none;
+}
 
 *:hover::-webkit-scrollbar-thumb {
-   display: block;
-   width: 6px;
- }
+  display: block;
+  width: 6px;
+}
 
 *::-webkit-scrollbar-track {
-   background-color: rgba(0, 0, 0, 0);
-   display: none;
- }
+  background-color: rgba(0, 0, 0, 0);
+  display: none;
+}
 
 *:hover::-webkit-scrollbar-track {
-   display: block;
- }
+  display: block;
+}
 
 @tailwind base;
 @tailwind components;

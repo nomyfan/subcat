@@ -71,7 +71,8 @@ function Selector(
             bottom: valueInRange(current.bottom - dyPect),
           }));
         }
-      }}>
+      }}
+    >
       {props.children}
       <div className="absolute top-0 left-0 h-full w-full flex flex-col">
         <div

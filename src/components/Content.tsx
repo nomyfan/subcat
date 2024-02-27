@@ -21,7 +21,8 @@ function Content() {
           storeActions.updateSelectedItem((item) => {
             return { ...item, ...factory(item) };
           });
-        }}>
+        }}
+      >
         <img
           src={selectedItem.src}
           alt=""

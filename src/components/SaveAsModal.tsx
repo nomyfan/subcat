@@ -166,7 +166,8 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={generating}>
+                        disabled={generating}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select output format" />
                         </SelectTrigger>
@@ -193,7 +194,8 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={generating}>
+                      disabled={generating}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select output format" />
                       </SelectTrigger>
@@ -249,7 +251,8 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
                       <Button
                         className="ml-2"
                         onClick={handleSaveTo}
-                        disabled={generating}>
+                        disabled={generating}
+                      >
                         Select directory
                       </Button>
                     </div>
@@ -264,13 +267,15 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
               disabled={
                 !formValues.filename || !formValues.saveto || generating
               }
-              onClick={handleGenerate}>
+              onClick={handleGenerate}
+            >
               {generating ? <ReloadIcon className="mr-2 animate-spin" /> : null}
               Save
             </Button>
             <DialogClose
               disabled={generating}
-              onClick={() => toggleVisible(false)}>
+              onClick={() => toggleVisible(false)}
+            >
               Cancel
             </DialogClose>
           </DialogFooter>
