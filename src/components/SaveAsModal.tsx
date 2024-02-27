@@ -218,7 +218,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
 
                 return (
                   <FormItem>
-                    <FormLabel>Quality</FormLabel>
+                    <FormLabel>Quality({field.value}%)</FormLabel>
                     <FormControl>
                       <Slider
                         min={1}
