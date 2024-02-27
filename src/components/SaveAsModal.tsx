@@ -129,7 +129,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
     };
 
     return (
-      <Dialog open={visible}>
+      <Dialog open={visible} onOpenChange={toggleVisible}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Save as</DialogTitle>
@@ -272,12 +272,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
               {generating ? <ReloadIcon className="mr-2 animate-spin" /> : null}
               Save
             </Button>
-            <DialogClose
-              disabled={generating}
-              onClick={() => toggleVisible(false)}
-            >
-              Cancel
-            </DialogClose>
+            <DialogClose disabled={generating}>Cancel</DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
