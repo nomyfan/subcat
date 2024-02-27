@@ -1,5 +1,6 @@
 import { open } from "@tauri-apps/api/dialog";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { Path } from "nice-path";
 
 import { store } from "./store";
 import type { Item, Index } from "./types";
@@ -14,6 +15,7 @@ export async function selectImages() {
   });
   if (files) {
     const fileUrls = Array.isArray(files) ? files : [files];
+    const latestOpenedFolder = new Path(fileUrls[0]).dirname().toString();
     const items = store.getState().items;
 
     const newItems = fileUrls
@@ -38,8 +40,11 @@ export async function selectImages() {
         return {
           selected: st.selected ?? 0,
           items: st.items.concat(newItems),
+          latestOpenedFolder,
         };
       });
+    } else {
+      store.setState({ latestOpenedFolder });
     }
   }
 }

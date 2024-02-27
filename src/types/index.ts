@@ -12,6 +12,7 @@ export interface StoreState {
   items: Item[];
   draggingId?: string;
   selected?: number;
+  latestOpenedFolder?: string;
 }
 
 export type Index = number;

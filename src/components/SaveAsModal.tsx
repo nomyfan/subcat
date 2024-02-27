@@ -74,6 +74,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
           form.setValue("filename", defaultFilename);
           const defaultFormat = "JPG";
           form.setValue("format", defaultFormat);
+          form.setValue("saveto", store.getState().latestOpenedFolder ?? "");
           toggleVisible(true);
         },
       };

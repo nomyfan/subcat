@@ -34,6 +34,7 @@
     "immer": "^9.0.21",
     "lucide-react": "^0.288.0",
     "nanoid": "^5.0.2",
+    "nice-path": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.35.0",
