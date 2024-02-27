@@ -70,7 +70,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
       return {
         open: () => {
           form.reset();
-          const defaultFilename = nanoid(7);
+          const defaultFilename = "subcat_" + nanoid(7);
           form.setValue("filename", defaultFilename);
           const defaultFormat = "JPG";
           form.setValue("format", defaultFormat);
