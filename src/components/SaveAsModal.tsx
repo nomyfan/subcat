@@ -2,7 +2,7 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 import { open } from "@tauri-apps/api/dialog";
 import { emit } from "@tauri-apps/api/event";
 import { nanoid } from "nanoid/non-secure";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useCallback, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import { useBoolean } from "react-use";
 import { Button } from "subcat/components/ui/button";
@@ -84,7 +84,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
       toggleVisible(false);
     });
 
-    const handleGenerate = () => {
+    const handleGenerate = useCallback(() => {
       const { saveto, filename, format, quality, compressType } =
         form.getValues();
       const items = store.getState().items;
@@ -113,9 +113,9 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
           setGenerating(false);
         });
       }
-    };
+    }, [form, setGenerating]);
 
-    const handleSaveTo = async () => {
+    const handleSelectFolderToSave = useCallback(async () => {
       const dir = await open({
         multiple: false,
         directory: true,
@@ -126,7 +126,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
       if (typeof dir === "string") {
         form.setValue("saveto", dir);
       }
-    };
+    }, [form]);
 
     return (
       <Dialog open={visible} onOpenChange={toggleVisible}>
@@ -250,7 +250,7 @@ export const SaveAsModal = forwardRef<ISaveAsModalRef, unknown>(
                       />
                       <Button
                         className="ml-2"
-                        onClick={handleSaveTo}
+                        onClick={handleSelectFolderToSave}
                         disabled={generating}
                       >
                         Select directory
